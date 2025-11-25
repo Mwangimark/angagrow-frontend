@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+
 
 function Chatbot() {
   const [open, setOpen] = useState(false);
@@ -22,7 +24,9 @@ function Chatbot() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSendMessage = (e) => {
+
+  // inside handleSendMessage
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
@@ -33,46 +37,72 @@ function Chatbot() {
       sender: "user",
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate bot response after delay
-    setTimeout(() => {
-      const botResponses = [
-        "Based on your recent drone imagery, I'm detecting good vegetation health with a 72% canopy coverage.",
-        "The yield estimate for your current crop is approximately 3.8 tons per hectare.",
-        "I can help you analyze stress patterns in your field. Would you like me to generate a detailed report?",
-        "Your vegetation index scores are trending positively this week compared to last.",
-        "I recommend scheduling another drone flight in 5-7 days to monitor progress.",
-        "The stress levels in the northwest quadrant appear elevated. Would you like specific recommendations?"
-      ];
-      
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      
+    try {
+      const res = await fetch("/api/chatbot/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: inputMessage })
+      });
+      const data = await res.json();
+
       const botMessage = {
         id: messages.length + 2,
-        text: randomResponse,
+        text: data.response,
         sender: "bot",
         timestamp: new Date()
       };
+      setMessages(prev => [...prev, botMessage]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleQuickQuestion = async (question) => {
+    setInputMessage(question);
+
+    // Immediately send to backend
+    const userMessage = {
+      id: messages.length + 1,
+      text: question,
+      sender: "user",
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    try {
+      const response = await axios.post("http://localhost:8000/api/chatbot/", {
+        message: question,
+      });
+
+      const botMessage = {
+        id: messages.length + 2,
+        text: response.data.reply,
+        sender: "bot",
+        timestamp: new Date(),
+      };
 
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error(error);
+      const botMessage = {
+        id: messages.length + 2,
+        text: "Sorry, I couldn't process your request. Please try again.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
-  const quickQuestions = [
-    "Yield estimate?",
-    "Crop health?",
-    "Stress analysis",
-    "Schedule flight"
-  ];
-
-  const handleQuickQuestion = (question) => {
-    setInputMessage(question);
-  };
 
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -82,9 +112,8 @@ function Chatbot() {
     <>
       {/* Chat button */}
       <button
-        className={`fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-2xl z-50 transition-all duration-300 hover:scale-110 hover:shadow-xl ${
-          open ? 'rotate-45' : 'rotate-0'
-        }`}
+        className={`fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-2xl z-50 transition-all duration-300 hover:scale-110 hover:shadow-xl ${open ? 'rotate-45' : 'rotate-0'
+          }`}
         onClick={() => setOpen(!open)}
       >
         <div className="flex items-center justify-center w-full h-full">
@@ -120,7 +149,7 @@ function Chatbot() {
                   <p className="text-xs text-white/80">Online • Ready to help</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setOpen(false)}
                 className="text-white/80 hover:text-white transition-colors"
               >
@@ -139,22 +168,20 @@ function Chatbot() {
                 className={`flex mb-4 ${message.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl p-3 ${
-                    message.sender === "user"
-                      ? "bg-emerald-500 text-white rounded-br-none"
-                      : "bg-white text-gray-800 rounded-bl-none shadow-sm border border-gray-200"
-                  }`}
+                  className={`max-w-[80%] rounded-2xl p-3 ${message.sender === "user"
+                    ? "bg-emerald-500 text-white rounded-br-none"
+                    : "bg-white text-gray-800 rounded-bl-none shadow-sm border border-gray-200"
+                    }`}
                 >
                   <p className="text-sm">{message.text}</p>
-                  <p className={`text-xs mt-1 ${
-                    message.sender === "user" ? "text-emerald-100" : "text-gray-500"
-                  }`}>
+                  <p className={`text-xs mt-1 ${message.sender === "user" ? "text-emerald-100" : "text-gray-500"
+                    }`}>
                     {formatTime(message.timestamp)}
                   </p>
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
               <div className="flex mb-4 justify-start">
                 <div className="bg-white text-gray-800 rounded-2xl rounded-bl-none p-3 shadow-sm border border-gray-200">

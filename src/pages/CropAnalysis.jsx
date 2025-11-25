@@ -18,30 +18,52 @@ function CropAnalysis() {
 
   // Handle upload/predict (currently simulating)
   const handleUpload = async () => {
-    if (!selectedFile) return;
-    
+    if (!selectedFile) {
+      alert("Please select an image first.");
+      return;
+    }
+
     setIsLoading(true);
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Simulated metrics for preview
-    setMetrics({
-      vari: 0.12,
-      gli: 0.08,
-      exg: 15.3,
-      canopy: 26.5,
-      stress: 73.5,
-      yieldEstimate: 3.8,
-    });
-    
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/crop-analysis/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to process the image");
+      }
+
+      const data = await response.json();
+      console.log("Response Data: ", data);
+
+      // Update metrics from backend response
+      setMetrics({
+        vari: data.results.vari ?? 0,
+        gli: data.results.gli ?? 0,
+        exg: data.results.exg ?? 0,
+        canopy: data.results.canopy_pct ?? 0,
+        stress: data.results.stress_pct ?? 0,
+        yieldEstimate: data.yield_estimate ?? 0,
+      });
+
+    } catch (error) {
+      console.error("UPLOAD ERROR: ", error);
+      alert("Error processing the image. Check the server.");
+    }
+
     setIsLoading(false);
   };
+
 
   const formatMetricName = (key) => {
     const names = {
       vari: "Vegetation Index",
-      gli: "Green Leaf Index", 
+      gli: "Green Leaf Index",
       exg: "Excess Green Index",
       canopy: "Canopy Coverage",
       stress: "Stress Level",
@@ -137,11 +159,10 @@ function CropAnalysis() {
             <button
               onClick={handleUpload}
               disabled={!selectedFile || isLoading}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-                !selectedFile || isLoading
+              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${!selectedFile || isLoading
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-              }`}
+                }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -168,8 +189,8 @@ function CropAnalysis() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               {Object.entries(metrics).map(([key, value]) => (
-                <div 
-                  key={key} 
+                <div
+                  key={key}
                   className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-green-200 group"
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -184,11 +205,11 @@ function CropAnalysis() {
                     {formatMetricName(key)}
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    {key === 'stress' && value > 50 
+                    {key === 'stress' && value > 50
                       ? 'High stress level detected. Consider irrigation review.'
                       : key === 'canopy' && value > 60
-                      ? 'Healthy canopy coverage'
-                      : 'Within expected range'
+                        ? 'Healthy canopy coverage'
+                        : 'Within expected range'
                     }
                   </p>
                 </div>
