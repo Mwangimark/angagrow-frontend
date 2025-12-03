@@ -2,145 +2,107 @@ import React from "react";
 
 const DashboardStats = () => {
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-      {/* Date Range Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                placeholder="DD/MM/YY"
-                className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-              <span className="text-gray-500">to</span>
-              <input
-                type="text"
-                placeholder="DD/MM/YY"
-                className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
+    <div className="p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left Column: ROI + Top Performing Instruments */}
+        <div className="col-span-2 space-y-6">
+          {/* ROI Overview */}
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row items-center md:items-start md:justify-start space-x-6">
+            {/* Pie Chart */}
+            <div className="w-32 h-32 relative">
+              <svg viewBox="0 0 36 36" className="w-full h-full">
+                <circle
+                  className="text-gray-200"
+                  strokeWidth="3"
+                  stroke="currentColor"
+                  fill="transparent"
+                  r="16"
+                  cx="18"
+                  cy="18"
+                />
+                <circle
+                  className="text-teal-500"
+                  strokeWidth="3"
+                  strokeDasharray="60, 40"
+                  stroke="currentColor"
+                  fill="transparent"
+                  r="16"
+                  cx="18"
+                  cy="18"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold">
+                60%
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700">
+                Credible Blooms Return on Investment Overview
+              </h2>
+              <ul className="mt-2 text-gray-500">
+                <li>
+                  <span className="inline-block w-3 h-3 bg-teal-500 rounded-full mr-2"></span>
+                  Interest Earning
+                </li>
+                <li className="mt-1">
+                  <span className="inline-block w-3 h-3 bg-blue-800 rounded-full mr-2"></span>
+                  Non-Interest Earning
+                </li>
+              </ul>
+              <p className="mt-2 text-green-500 font-medium">
+                +10% overall increase in accounts expected in the next two months
+              </p>
+            </div>
+          </div>
+
+          {/* Top Performing Farms */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Top Performing Farms Financing Instruments
+            </h2>
+            <div className="space-y-4">
+              {[
+                { name: "LPO Financing", amount: "KES 6 Billion", color: "bg-orange-500", progress: 0.8 },
+                { name: "Letter of Credit", amount: "KES 4 Billion", color: "bg-teal-500", progress: 0.6 },
+                { name: "Supply Chain Financing", amount: "KES 3 Billion", color: "bg-blue-800", progress: 0.75 },
+              ].map((item) => (
+                <div key={item.name}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-gray-600">{item.name}</span>
+                    <span className="text-gray-800 font-medium">{item.amount}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 h-3 rounded-full">
+                    <div
+                      className={`${item.color} h-3 rounded-full`}
+                      style={{ width: `${item.progress * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-        <button className="px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200">
-          Update Period
-        </button>
-      </div>
 
-      {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Total Est. Yield */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">Total Est. Yield</h3>
-            <span className="flex items-center text-green-600 font-medium">
-              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-              10% increase
-            </span>
-          </div>
-          <div className="text-3xl font-bold text-gray-900 mb-1">33,000T</div>
-          <p className="text-gray-600">10% increase from Last Month</p>
-        </div>
-
-        {/* Total Est. Value of Yield */}
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">Total Est. Value of Yield</h3>
-            <span className="flex items-center text-blue-600 font-medium">
-              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-              15% increase
-            </span>
-          </div>
-          <div className="text-3xl font-bold text-gray-900 mb-1">KES. 200 M</div>
-          <p className="text-gray-600">15% increase from Last Month</p>
-        </div>
-      </div>
-
-      {/* Status Summary Grid */}
-      <div className="mb-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">Status Summary</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { title: "Cycle Yield", number: "20,000 T", value: "KES. 177M", color: "from-purple-50 to-purple-100", border: "border-purple-200" },
-            { title: "Buyer Pending Sales", number: "7,000T", value: "KES. 50M", color: "from-amber-50 to-amber-100", border: "border-amber-200" },
-            { title: "Crops Analysis Done", number: "60 HA", value: "KES. 5.7B", color: "from-emerald-50 to-emerald-100", border: "border-emerald-200" },
-            { title: "Completed Sales", number: "10,000T", value: "KES. 120M", color: "from-green-50 to-green-100", border: "border-green-200" },
-            { title: "Number of Orders", number: "3,000T", value: "KES. 7M", color: "from-blue-50 to-blue-100", border: "border-blue-200" },
-            { title: "Sprays Done", number: "20 Sprays", value: "KES. 800K", color: "from-cyan-50 to-cyan-100", border: "border-cyan-200" },
-          ].map((item, index) => (
-            <div key={index} className={`bg-gradient-to-r ${item.color} rounded-xl p-4 border ${item.border}`}>
-              <h4 className="font-medium text-gray-900 mb-2">{item.title}</h4>
-              <div className="text-lg font-bold text-gray-900">{item.number}</div>
-              <div className="text-sm text-gray-600">{item.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Highlights Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Harvest Highlights */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Harvest Highlights</h3>
-          <ul className="space-y-3">
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">Interested buyers <span className="font-semibold">20</span></span>
+        {/* Right Column: Highlights */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Highlights</h2>
+          <ul className="text-gray-600 space-y-2 list-disc list-inside">
+            <li>
+              In the last 30 days, uptake of LPO financing products increased by{" "}
+              <span className="text-green-500 font-medium">50%</span>
             </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">This is an YTD growth of 7% representing a <span className="font-semibold">KES 100M</span> growth</span>
+            <li>
+              In the last 30 days, uptake of supply chain financing decreased by{" "}
+              <span className="text-red-500 font-medium">35%</span>
             </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">Projected growth rate is <span className="font-semibold">12%</span></span>
+            <li>
+              <span className="text-green-500 font-medium">100</span> CB buyers repaid their loans within 60 days.
+            </li>
+            <li>
+              <span className="text-orange-500 font-medium">50</span> buyers of CB are due to make payment within 7 days.
             </li>
           </ul>
-        </div>
-
-        {/* Current Cycle Highlights */}
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Cycle Highlights</h3>
-          <ul className="space-y-3">
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">Total buyer commitments are now <span className="font-semibold">102M</span></span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">This is an YTD growth of <span className="font-semibold">100M</span> representing a <span className="font-semibold">6.9%</span> growth</span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">Projected growth rate is <span className="font-semibold">12%</span></span>
-            </li>
-            <li className="flex items-start">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <span className="text-gray-700">This is an YTD growth of <span className="font-semibold">102M</span> representing a <span className="font-semibold">6.9%</span> growth</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Summary Footer */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Last updated: Today, {new Date().toLocaleDateString('en-GB')}
-          </div>
-          <div className="flex space-x-2">
-            <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200">
-              Export PDF
-            </button>
-            <button className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors duration-200">
-              Generate Report
-            </button>
-          </div>
         </div>
       </div>
     </div>
