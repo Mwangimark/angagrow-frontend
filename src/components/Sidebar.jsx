@@ -6,7 +6,7 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
-    { path: "/", label: "Dashboard", icon: "📊" },
+    { path: "/dashboard", label: "Dashboard", icon: "📊" },
     { path: "/profile", label: "Profile", icon: "👤" },
     { path: "/crop-analysis", label: "Crop Analysis", icon: "🌱" },
     { path: "/orders", label: "Orders", icon: "📦" },
