@@ -1,8 +1,12 @@
 import React from 'react'
 import { FiCalendar, FiArrowRight, FiBell } from "react-icons/fi";
+import { getUser } from "../../utils/auth";
 
 
 const Header = () => {
+  const user = getUser(); 
+
+
   return (
     <>
     <div className="w-full flex items-start justify-between mb-4 mt-3 px-3 py-2">
@@ -40,12 +44,12 @@ const Header = () => {
                     }}
                     className="w-full h-full object-cover"
                   />
-                  <span className="select-none">EB</span>
+                  {/* <span className="select-none">EB</span> */}
                 </div>
     
                 <div className="hidden sm:flex sm:flex-col sm:items-start">
-                  <span className="text-sm font-medium text-gray-800">EQUITY BK</span>
-                  <span className="text-xs text-gray-400">Admin</span>
+                  <span className="text-sm font-medium text-gray-800">{user?.first_name || ""}</span>
+
                 </div>
               </div>
             </div>

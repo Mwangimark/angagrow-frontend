@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 
-
-const RegistrationForm = () => {
-    const [selectedRole, setSelectedRole] = useState("farmer");
+const RegistrationForm = ({ selectedRole }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        first_name: '',  // Changed from firstName
+        last_name: '',   // Changed from lastName
         email: '',
         phone: '',
         password: '',
-        confirmPassword: '',
+        role: selectedRole,  // Added role to formData
     });
     const [errors, setErrors] = useState({});
     const [passwordStrength, setPasswordStrength] = useState(0);
+
     const checkPasswordStrength = (pass) => {
         let strength = 0;
         if (pass.length >= 8) strength += 1;
@@ -24,9 +23,39 @@ const RegistrationForm = () => {
         setPasswordStrength(strength);
     };
 
-    const handleRegister = (data) => {
-        console.log("Registration Data:", data);
-        setIsSubmitted(true);
+    const handleRegister = async (data) => {
+        try {
+            const response = await fetch('http://localhost:8000/accounts/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                // Handle backend validation errors
+                if (errorData) {
+                    const backendErrors = {};
+                    Object.keys(errorData).forEach(key => {
+                        backendErrors[key] = Array.isArray(errorData[key]) 
+                            ? errorData[key].join(' ') 
+                            : errorData[key];
+                    });
+                    setErrors(backendErrors);
+                }
+                return;
+            }
+
+            const result = await response.json();
+            console.log('Registration success:', result);
+            setIsSubmitted(true);
+
+        } catch (error) {
+            console.error('Error registering:', error);
+            setErrors({ general: 'Registration failed. Please try again.' });
+        }
     };
 
     const handleChange = (e) => {
@@ -70,14 +99,17 @@ const RegistrationForm = () => {
 
         if (Object.keys(validationErrors).length === 0) {
             setIsLoading(true);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
+            
+            // Include role in submission data
             const submissionData = {
                 ...formData,
                 role: selectedRole
             };
 
-            handleRegister(submissionData);
+            // Remove confirmPassword from submission as backend doesn't expect it
+            delete submissionData.confirmPassword;
+
+            await handleRegister(submissionData);
             setIsLoading(false);
         } else {
             setErrors(validationErrors);
@@ -89,8 +121,8 @@ const RegistrationForm = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = /^[\+]?[1-9][\d]{0,14}$/;
 
-        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+        if (!formData.first_name.trim()) newErrors.first_name = 'First name is required';
+        if (!formData.last_name.trim()) newErrors.last_name = 'Last name is required';
 
         if (!formData.email) {
             newErrors.email = 'Email is required';
@@ -104,14 +136,10 @@ const RegistrationForm = () => {
 
         if (!formData.password) {
             newErrors.password = 'Password is required';
+        } else if (formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
         } else if (passwordStrength < 3) {
             newErrors.password = 'Password is too weak';
-        }
-
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Please confirm your password';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
         }
 
         return newErrors;
@@ -139,12 +167,12 @@ const RegistrationForm = () => {
                     <button
                         onClick={() => {
                             setFormData({
-                                firstName: '',
-                                lastName: '',
+                                first_name: '',
+                                last_name: '',
                                 email: '',
                                 phone: '',
                                 password: '',
-                                confirmPassword: '',
+                                role: selectedRole,
                             });
                             setErrors({});
                             setIsSubmitted(false);
@@ -169,16 +197,16 @@ const RegistrationForm = () => {
                             First Name *
                         </label>
                         <input
-                            name="firstName"
+                            name="first_name"
                             type="text"
-                            value={formData.firstName}
+                            value={formData.first_name}
                             onChange={handleChange}
-                            className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.firstName ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
+                            className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.first_name ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
                                 }`}
                             placeholder="John"
                         />
-                        {errors.firstName && (
-                            <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>
+                        {errors.first_name && (
+                            <p className="mt-1 text-xs text-red-600">{errors.first_name}</p>
                         )}
                     </div>
 
@@ -187,16 +215,16 @@ const RegistrationForm = () => {
                             Last Name *
                         </label>
                         <input
-                            name="lastName"
+                            name="last_name"
                             type="text"
-                            value={formData.lastName}
+                            value={formData.last_name}
                             onChange={handleChange}
-                            className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.lastName ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
+                            className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.last_name ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
                                 }`}
                             placeholder="Doe"
                         />
-                        {errors.lastName && (
-                            <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>
+                        {errors.last_name && (
+                            <p className="mt-1 text-xs text-red-600">{errors.last_name}</p>
                         )}
                     </div>
                 </div>
@@ -252,6 +280,7 @@ const RegistrationForm = () => {
                         className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
                             }`}
                         placeholder="••••••••"
+                        minLength="6"
                     />
 
                     {/* Password Strength */}
@@ -272,32 +301,6 @@ const RegistrationForm = () => {
 
                     {errors.password && (
                         <p className="mt-1 text-xs text-red-600">{errors.password}</p>
-                    )}
-                </div>
-
-                {/* Confirm Password */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Confirm Password *
-                    </label>
-                    <input
-                        name="confirmPassword"
-                        type="password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.confirmPassword
-                            ? 'border-red-300 focus:ring-red-500'
-                            : formData.confirmPassword && formData.password === formData.confirmPassword
-                                ? 'border-green-300 focus:ring-green-500'
-                                : 'border-gray-300 focus:ring-emerald-500'
-                            }`}
-                        placeholder="••••••••"
-                    />
-                    {errors.confirmPassword && (
-                        <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
-                    )}
-                    {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                        <p className="mt-1 text-xs text-green-600">✓ Passwords match</p>
                     )}
                 </div>
 
@@ -342,6 +345,13 @@ const RegistrationForm = () => {
                         'Create Account'
                     )}
                 </button>
+
+                {/* General errors */}
+                {errors.general && (
+                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-600 text-center">{errors.general}</p>
+                    </div>
+                )}
             </form>
             {/* Login Link */}
             <div className="mt-6 text-center">
@@ -353,7 +363,7 @@ const RegistrationForm = () => {
                 </p>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default RegistrationForm
+export default RegistrationForm;

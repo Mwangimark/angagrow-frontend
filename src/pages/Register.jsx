@@ -41,7 +41,7 @@ const Register = () => {
             </div>
           </div>
 
-          <RegisterationForm />
+          <RegisterationForm selectedRole={selectedRole} />
         </div>
       </div>
     </div>

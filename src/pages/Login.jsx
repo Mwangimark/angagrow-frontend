@@ -1,18 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import LoginRoleSelector from "../components/login/LoginRoleSelector";
 import LoginForm from "../components/login/LoginForm";
+import { isAuthenticated, getUser } from "../utils/auth";
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState("farmer");
+  const navigate = useNavigate();
+
+  // Redirect if already logged in - BASED ON USER ROLE
+  useEffect(() => {
+    if (isAuthenticated()) {
+        navigate("/dashboard"); // ✅ Always /dashboard
+    }
+}, [navigate]);
 
   const handleLogin = (data) => {
-    console.log("Login Data:", data);
-    // Add your actual login logic here
+    console.log("Login successful:", data);
+    // LoginForm already handles the API call and redirection
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 flex items-center justify-center p-4">
-
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
           {/* Decorative header */}
@@ -70,7 +79,7 @@ const Login = () => {
 
             {/* Footer links */}
             <div className="text-center">
-              <a href="#" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200">
+              <a href="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200">
                 Forgot password?
               </a>
               <p className="text-gray-600 text-sm mt-4">

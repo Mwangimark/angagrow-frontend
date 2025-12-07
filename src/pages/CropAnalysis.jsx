@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import RecommendationCard from "../components/RecommendationCard";
+import { fetchWithAuth } from "../utils/apis";
 
 function CropAnalysis() {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -32,27 +33,23 @@ function CropAnalysis() {
     selectedFiles.forEach(file => formData.append("images", file));
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/crop-analysis/", {
+      const data = await fetchWithAuth("http://127.0.0.1:8000/api/crop-analysis/", {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to process images");
-
-      const data = await response.json();
       console.log("Response Data: ", data);
 
-      // Set metrics from backend response
       setMetrics({
-        avg_vari: data.avg_vari ?? 0,
-        avg_gli: data.avg_gli ?? 0,
-        avg_exg: data.avg_exg ?? 0,
-        avg_canopy_cover: data.avg_canopy_cover ?? 0,
-        avg_stress_percentage: data.avg_stress_percentage ?? 0,
-        avg_yield_estimate: data.avg_yield_estimate ?? 0,
+        vari: data.vari ?? 0,
+        gli: data.gli ?? 0,
+        exg: data.exg ?? 0,
+        canopy_cover: data.canopy_cover ?? 0,
+        stress_percentage: data.stress_percentage ?? 0,
+        yield_estimate: data.yield_estimate ?? 0,
         num_images_processed: data.num_images_processed ?? 0
       });
-      
+
       setAnalysisResults({
         session_id: data.session_id,
         recommendations: data.recommendations || []
@@ -60,7 +57,7 @@ function CropAnalysis() {
 
     } catch (error) {
       console.error("UPLOAD ERROR: ", error);
-      alert("Error processing the images. Check the server.");
+      alert(`Error: ${error.message}`);
     }
 
     setIsLoading(false);
@@ -69,12 +66,12 @@ function CropAnalysis() {
   // Helper functions for metrics display
   const getMetricRange = (key) => {
     const ranges = {
-      'avg_canopy_cover': { min: '0%', max: '100%', optimalMin: 40, optimalMax: 70 },
-      'avg_stress_percentage': { min: '0%', max: '100%', optimalMin: 0, optimalMax: 15 },
-      'avg_yield_estimate': { min: '0', max: '10+', optimalMin: 20, optimalMax: 50 },
-      'avg_vari': { min: '-1.0', max: '1.0', optimalMin: 0.2, optimalMax: 1.0 },
-      'avg_gli': { min: '-1.0', max: '1.0', optimalMin: 0.1, optimalMax: 1.0 },
-      'avg_exg': { min: '0', max: '255', optimalMin: 20, optimalMax: 50 },
+      'canopy_cover': { min: '0%', max: '100%', optimalMin: 40, optimalMax: 70 },
+      'astress_percentage': { min: '0%', max: '100%', optimalMin: 0, optimalMax: 15 },
+      'yield_estimate': { min: '0', max: '10+', optimalMin: 20, optimalMax: 50 },
+      'vari': { min: '-1.0', max: '1.0', optimalMin: 0.2, optimalMax: 1.0 },
+      'gli': { min: '-1.0', max: '1.0', optimalMin: 0.1, optimalMax: 1.0 },
+      'exg': { min: '0', max: '255', optimalMin: 20, optimalMax: 50 },
       'num_images_processed': { min: '0', max: '100+', optimalMin: 1, optimalMax: 100 }
     };
     return ranges[key] || { min: '0', max: '100', optimalMin: 0, optimalMax: 100 };
@@ -99,7 +96,7 @@ function CropAnalysis() {
 
   const getMetricRangeColor = (key, value) => {
     const range = getMetricRange(key);
-    
+
     if (value < range.optimalMin) return 'bg-red-500';
     if (value > range.optimalMax) {
       if (key.includes('stress')) return 'bg-red-500';
@@ -127,12 +124,12 @@ function CropAnalysis() {
 
   const formatMetricName = (key) => {
     const names = {
-      'avg_canopy_cover': 'Canopy Coverage',
-      'avg_stress_percentage': 'Stress Level',
-      'avg_yield_estimate': 'Yield Estimate',
-      'avg_vari': 'Vegetation Index (VARI)',
-      'avg_gli': 'Green Leaf Index (GLI)',
-      'avg_exg': 'Excess Green Index (EXG)',
+      'canopy_cover': 'Canopy Coverage',
+      'stress_percentage': 'Stress Level',
+      'yield_estimate': 'Yield Estimate',
+      'vari': 'Vegetation Index (VARI)',
+      'gli': 'Green Leaf Index (GLI)',
+      'exg': 'Excess Green Index (EXG)',
       'num_images_processed': 'Images Processed'
     };
     return names[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -140,12 +137,12 @@ function CropAnalysis() {
 
   const getMetricIcon = (key) => {
     const icons = {
-      'avg_canopy_cover': '🌳',
-      'avg_stress_percentage': '⚠️',
-      'avg_yield_estimate': '📈',
-      'avg_vari': '🌱',
-      'avg_gli': '🍃',
-      'avg_exg': '📊',
+      'canopy_cover': '🌳',
+      'stress_percentage': '⚠️',
+      'yield_estimate': '📈',
+      'vari': '🌱',
+      'gli': '🍃',
+      'exg': '📊',
       'num_images_processed': '📷'
     };
     return icons[key] || "📋";
@@ -153,79 +150,79 @@ function CropAnalysis() {
 
   const getMetricColor = (key, value) => {
     const range = getMetricRange(key);
-    
+
     if (key.includes('stress_percentage')) {
       if (value > 15) return 'text-red-600';
       if (value > 5) return 'text-yellow-600';
       return 'text-green-600';
     }
-    
+
     if (key.includes('canopy_cover')) {
       if (value < 40) return 'text-red-600';
       if (value > 70) return 'text-green-600';
       return 'text-yellow-600';
     }
-    
+
     if (key.includes('yield_estimate')) {
       if (value < 20) return 'text-red-600';
       if (value < 50) return 'text-yellow-600';
       return 'text-green-600';
     }
-    
+
     if (key.includes('vari')) {
       if (value < 0.2) return 'text-red-600';
       return 'text-green-600';
     }
-    
+
     if (key.includes('gli')) {
       if (value < 0.1) return 'text-red-600';
       return 'text-green-600';
     }
-    
+
     if (key.includes('exg')) {
       if (value < 20) return 'text-red-600';
       if (value > 50) return 'text-green-600';
       return 'text-yellow-600';
     }
-    
+
     return 'text-blue-600';
   };
 
   const getMetricDescription = (key, value) => {
-    if (key === 'avg_stress_percentage') {
+    if (key === 'stress_percentage') {
       if (value > 15) return 'High stress level. Immediate action needed.';
       if (value > 5) return 'Moderate stress. Monitor conditions closely.';
       return 'Low stress level. Good crop health.';
     }
-    
-    if (key === 'avg_canopy_cover') {
+
+    if (key === 'canopy_cover') {
       if (value < 40) return 'Low canopy coverage. Consider improving density.';
       if (value > 70) return 'Healthy canopy coverage. Good growth.';
       return 'Moderate canopy coverage. Within expected range.';
     }
-    
-    if (key === 'avg_yield_estimate') {
+
+    if (key === 'yield_estimate') {
       if (value < 2) return 'Low yield projection. Review farming practices.';
       if (value < 5) return 'Moderate yield projection. Room for improvement.';
       return 'High yield projection. Excellent performance!';
     }
-    
-    if (key === 'avg_vari') {
+
+    if (key === 'vari') {
       if (value < 0.2) return 'Low vegetation index. Growth may be limited.';
       return 'Good vegetation health. Healthy crop growth.';
     }
-    
-    if (key === 'avg_gli') {
+
+    if (key === 'gli') {
       if (value < 0.1) return 'Weak leaf vigor. Growth may be slowed.';
       return 'Strong leaf vigor. Active plant growth.';
     }
-    
-    if (key === 'avg_exg') {
+
+    if (key === 'exg') {
       if (value < 20) return 'Low greenness. Chlorophyll content may be low.';
       if (value > 50) return 'High greenness. Good chlorophyll levels.';
       return 'Moderate greenness. Within normal range.';
     }
-    
+
     return 'Within expected range';
   };
 
@@ -281,9 +278,9 @@ function CropAnalysis() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {previews.map((url, idx) => (
                     <div key={idx} className="relative">
-                      <img 
-                        src={url} 
-                        alt={`Preview ${idx}`} 
+                      <img
+                        src={url}
+                        alt={`Preview ${idx}`}
                         className="rounded-lg shadow-md w-full h-32 object-cover"
                       />
                       <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
@@ -299,11 +296,10 @@ function CropAnalysis() {
             <button
               onClick={handleUpload}
               disabled={!selectedFiles.length || isLoading}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-                !selectedFiles.length || isLoading
+              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${!selectedFiles.length || isLoading
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-              }`}
+                }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -336,7 +332,7 @@ function CropAnalysis() {
               {Object.entries(metrics).map(([key, value]) => {
                 // Skip non-numeric metrics for the grid
                 if (key === 'num_images_processed' || typeof value !== 'number') return null;
-                
+
                 return (
                   <div key={key} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-green-200">
                     <div className="flex items-start justify-between mb-4">
@@ -349,7 +345,7 @@ function CropAnalysis() {
                     <p className="text-gray-600 text-sm mb-4">
                       {getMetricDescription(key, value)}
                     </p>
-                    
+
                     {/* Value Range Indicator */}
                     <div className="mt-4">
                       <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -358,7 +354,7 @@ function CropAnalysis() {
                         <span>High</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
+                        <div
                           className={`h-2 rounded-full ${getMetricRangeColor(key, value)} transition-all duration-300`}
                           style={{ width: `${getMetricPercentage(key, value)}%` }}
                         ></div>
@@ -395,7 +391,7 @@ function CropAnalysis() {
                   <h2 className="text-3xl font-bold text-gray-900 mb-3">AI Recommendations</h2>
                   <p className="text-gray-600">Personalized suggestions based on your crop analysis</p>
                 </div>
-                
+
                 <div className="space-y-6">
                   {analysisResults.recommendations.map((rec, index) => (
                     <RecommendationCard key={index} recommendation={rec} />

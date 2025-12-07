@@ -1,21 +1,123 @@
 import React, { useState } from "react";
 
 const LoginForm = ({ selectedRole, onSubmit }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const submit = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    onSubmit({ email, password, role: selectedRole });
-    setIsLoading(false);
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length === 0) {
+      setIsLoading(true);
+
+      try {
+        // Call the login API
+        const response = await fetch('http://localhost:8000/accounts/login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data.errors) {
+            setErrors(data.errors);
+          } else if (data.message) {
+            setErrors({ general: data.message });
+          } else {
+            setErrors({ general: 'Login failed. Please try again.' });
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        // ✅ CRITICAL: Save tokens to localStorage
+        if (data.success && data.tokens && data.user) {
+          console.log('💾 Saving tokens and selected role...');
+
+          localStorage.setItem('access_token', data.tokens.access);
+          localStorage.setItem('refresh_token', data.tokens.refresh);
+
+          // ✅ Save user data WITH selected role
+          const userWithSelectedRole = {
+            ...data.user,
+            login_selected_role: selectedRole // ✅ Store selected role
+          };
+          localStorage.setItem('user', JSON.stringify(userWithSelectedRole));
+
+          // Call parent onSubmit
+          if (onSubmit) {
+            onSubmit(data);
+          }
+
+          // ✅ Use window.location.href for immediate redirect
+          // ✅ Redirect based on SELECTED role at login time
+          setTimeout(() => {
+            console.log('🔀 Redirecting to unified dashboard for role:', selectedRole);
+            window.location.href = '/dashboard'; // ✅ Always /dashboard
+          }, 100);
+        } else {
+          setErrors({ general: 'Invalid response from server' });
+        }
+
+      } catch (error) {
+        console.error('Login error:', error);
+        setErrors({ general: 'Network error. Please check your connection.' });
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setErrors(validationErrors);
+    }
   };
 
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Role indicator */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 border border-green-100">
         <div className="flex items-center justify-between">
@@ -45,14 +147,21 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
             </svg>
           </div>
           <input
+            name="email"
             type="email"
-            className="pl-10 w-full border border-gray-300 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+            className={`pl-10 w-full border rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.email
+              ? 'border-red-300 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-emerald-500 focus:border-emerald-300'
+              }`}
             placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
             required
           />
         </div>
+        {errors.email && (
+          <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+        )}
       </div>
 
       {/* Password Input */}
@@ -67,14 +176,21 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
             </svg>
           </div>
           <input
+            name="password"
             type="password"
-            className="pl-10 w-full border border-gray-300 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+            className={`pl-10 w-full border rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.password
+              ? 'border-red-300 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-emerald-500 focus:border-emerald-300'
+              }`}
             placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
             required
           />
         </div>
+        {errors.password && (
+          <p className="mt-1 text-xs text-red-600">{errors.password}</p>
+        )}
       </div>
 
       {/* Remember me & Forgot password */}
@@ -83,23 +199,34 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
           <input
             id="remember-me"
             type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
             className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
           />
           <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
             Remember me
           </label>
         </div>
+        <a href="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+          Forgot password?
+        </a>
       </div>
+
+      {/* General Error Message */}
+      {errors.general && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-sm text-red-600 text-center">{errors.general}</p>
+        </div>
+      )}
 
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={!selectedRole || !email || !password || isLoading}
-        className={`w-full py-3.5 px-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:-translate-y-0.5 ${
-          !selectedRole || !email || !password || isLoading
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl'
-        }`}
+        disabled={isLoading}
+        className={`w-full py-3.5 px-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:-translate-y-0.5 ${isLoading
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl'
+          }`}
       >
         {isLoading ? (
           <div className="flex items-center justify-center">
@@ -107,7 +234,7 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Signing in...
+            Signing In...
           </div>
         ) : (
           'Sign In'

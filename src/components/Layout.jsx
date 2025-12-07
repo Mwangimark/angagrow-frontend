@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet } from "react-router-dom"; // This import is crucial
 import Sidebar from "./Sidebar";
 import ChatbotFloating from "./ChatbotFloating";
 
@@ -9,9 +10,9 @@ function Layout({ children }) {
         <Sidebar />
       </div>
       <main className="flex-1 bg-gray-100 ml-64">
-        {children}
+        {children || <Outlet />} {/* This renders nested routes */}
       </main>
-       <ChatbotFloating />
+      <ChatbotFloating />
     </div>
   );
 }

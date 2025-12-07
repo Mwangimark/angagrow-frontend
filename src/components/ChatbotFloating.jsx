@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import { getUser } from "../utils/auth";
+import { fetchWithAuth } from "../utils/apis";
 
 function ChatbotFloating() {
   const [open, setOpen] = useState(false);
@@ -14,8 +15,36 @@ function ChatbotFloating() {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Get user role for personalized questions
+  const user = getUser();
+  const userRole = user?.login_selected_role || user?.role || 'farmer';
 
-  const quickQuestions = ["Yield estimate?", "Crop health?", "Stress analysis", "Schedule flight"];
+  // Role-based quick questions
+  const quickQuestions = {
+    farmer: [
+      "What does my canopy cover mean?",
+      "How to reduce crop stress?",
+      "Is my yield estimate good?",
+      "When should I harvest?",
+      "What fertilizer should I use?"
+    ],
+    financier: [
+      "ROI on this crop?",
+      "Market price trends?",
+      "Investment risk assessment",
+      "Yield vs profit analysis"
+    ],
+    buyer: [
+      "Crop quality assessment",
+      "Harvest timeline estimate",
+      "Batch consistency check",
+      "Export readiness analysis"
+    ]
+  };
+
+  // Get questions based on user role
+  const currentQuickQuestions = quickQuestions[userRole] || quickQuestions.farmer;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,23 +57,33 @@ function ChatbotFloating() {
   const sendMessageToBackend = async (messageText) => {
     setIsTyping(true);
     try {
-      const response = await axios.post("http://localhost:8000/api/chatbot/", { message: messageText });
-      console.log("Backend response:", response.data);
+      // Use fetchWithAuth instead of axios
+      const response = await fetchWithAuth("http://127.0.0.1:8000/api/chatbot/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: messageText }),
+      });
+      
+      console.log("Backend response:", response);
       
       const botMessage = {
         id: Date.now(),
-        text: response.data.response, // make sure your backend returns {response: "..."}
+        text: response.response || response.message || "I received your message but didn't get a proper response.",
         sender: "bot",
         timestamp: new Date(),
+        data: response.data || null
       };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error(error);
+      console.error("Chatbot error:", error);
       const botMessage = {
         id: Date.now(),
-        text: "Sorry, I couldn't process your request. Please try again.",
+        text: error.message || "Sorry, I couldn't process your request. Please try again.",
         sender: "bot",
         timestamp: new Date(),
+        isError: true
       };
       setMessages((prev) => [...prev, botMessage]);
     } finally {
@@ -80,14 +119,61 @@ function ChatbotFloating() {
 
   const formatTime = (date) => date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+  // Clear chat history
+  const clearChat = async () => {
+    try {
+      await fetchWithAuth("/chatbot/clear/", {
+        method: "DELETE",
+      });
+      setMessages([
+        {
+          id: Date.now(),
+          text: "Chat cleared! How can I help you today?",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to clear chat:", error);
+      // Still show cleared message locally even if API fails
+      setMessages([
+        {
+          id: Date.now(),
+          text: "Chat cleared! How can I help you today?",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    }
+  };
+
+  // Load chat history on open
+  useEffect(() => {
+    if (open) {
+      loadChatHistory();
+    }
+  }, [open]);
+
+  const loadChatHistory = async () => {
+    try {
+      const history = await fetchWithAuth("/chatbot/history/");
+      if (history?.length > 0) {
+        setMessages(history);
+      }
+    } catch (error) {
+      console.log("No chat history found or error loading history:", error);
+    }
+  };
+
   return (
     <>
       {/* Chat button */}
       <button
-        className={`fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-2xl z-50 transition-all duration-300 hover:scale-110 hover:shadow-xl ${
+        className={`fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-2xl z-50 transition-all duration-300 hover:scale-110 hover:shadow-xl group ${
           open ? "rotate-45" : "rotate-0"
         }`}
         onClick={() => setOpen(!open)}
+        title="Chat with Farm Assistant"
       >
         <div className="flex items-center justify-center w-full h-full">
           {open ? (
@@ -101,19 +187,45 @@ function ChatbotFloating() {
           )}
         </div>
         {!open && <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>}
+        
+        {/* Tooltip */}
+        <div className="absolute -top-12 right-0 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+          Ask AI Farming Assistant
+        </div>
       </button>
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 w-80 h-[480px] bg-white shadow-2xl rounded-2xl flex flex-col z-50 border border-gray-200 overflow-hidden transform transition-all duration-300">
+        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white shadow-2xl rounded-2xl flex flex-col z-50 border border-gray-200 overflow-hidden transform transition-all duration-300">
           {/* Header */}
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4 text-white flex justify-between items-center">
-            <h3 className="font-semibold">Farm Assistant</h3>
-            <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                <span className="text-2xl">🌱</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">AngaGrow AI</h3>
+                <p className="text-sm text-green-100">{userRole.charAt(0).toUpperCase() + userRole.slice(1)} Assistant</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={clearChat}
+                className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-colors"
+                title="Clear chat history"
+              >
+                Clear
+              </button>
+              <button 
+                onClick={() => setOpen(false)} 
+                className="text-white/80 hover:text-white"
+                title="Close chat"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -121,14 +233,16 @@ function ChatbotFloating() {
             {messages.map((msg) => (
               <div key={msg.id} className={`flex mb-4 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[80%] rounded-2xl p-3 ${
+                  className={`max-w-[85%] rounded-2xl p-3 ${
                     msg.sender === "user"
                       ? "bg-emerald-500 text-white rounded-br-none"
+                      : msg.isError
+                      ? "bg-red-50 text-red-800 border border-red-200"
                       : "bg-white text-gray-800 rounded-bl-none shadow-sm border border-gray-200"
                   }`}
                 >
-                  <p className="text-sm">{msg.text}</p>
-                  <p className={`text-xs mt-1 ${msg.sender === "user" ? "text-emerald-100" : "text-gray-500"}`}>
+                  <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                  <p className={`text-xs mt-1 ${msg.sender === "user" ? "text-emerald-100" : msg.isError ? "text-red-600" : "text-gray-500"}`}>
                     {formatTime(msg.timestamp)}
                   </p>
                 </div>
@@ -138,10 +252,13 @@ function ChatbotFloating() {
             {isTyping && (
               <div className="flex mb-4 justify-start">
                 <div className="bg-white text-gray-800 rounded-2xl rounded-bl-none p-3 shadow-sm border border-gray-200">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                    </div>
+                    <span className="text-xs text-gray-600">Analyzing...</span>
                   </div>
                 </div>
               </div>
@@ -150,34 +267,55 @@ function ChatbotFloating() {
           </div>
 
           {/* Quick questions */}
-          <div className="px-4 py-2 bg-white border-t border-gray-200 flex flex-wrap gap-2">
-            {quickQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleQuickQuestion(q)}
-                className="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors duration-200"
-              >
-                {q}
-              </button>
-            ))}
+          <div className="px-4 py-3 bg-white border-t border-gray-200">
+            <p className="text-xs font-medium text-gray-600 mb-2">Quick questions for {userRole}:</p>
+            <div className="flex flex-wrap gap-2">
+              {currentQuickQuestions.map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleQuickQuestion(q)}
+                  className="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors duration-200 hover:scale-105"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-200 flex space-x-2">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Ask about your crops..."
-              className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
-            <button
-              type="submit"
-              disabled={!inputMessage.trim()}
-              className="bg-emerald-500 text-white p-2 rounded-full hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              Send
-            </button>
+          <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-200">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder={`Ask about ${userRole === 'farmer' ? 'crops' : userRole === 'financier' ? 'investments' : 'purchases'}...`}
+                className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (inputMessage.trim()) {
+                      handleSendMessage(e);
+                    }
+                  }
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!inputMessage.trim() || isTyping}
+                className={`bg-gradient-to-r from-green-500 to-emerald-600 text-white p-2.5 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 ${
+                  !inputMessage.trim() || isTyping ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                title="Send message"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Press Enter to send, Shift+Enter for new line
+            </p>
           </form>
         </div>
       )}
