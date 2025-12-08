@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { logout, getUser } from "../utils/auth";
 
 function Sidebar() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -21,7 +20,7 @@ function Sidebar() {
     { path: "/profile", label: "Profile", icon: "👤" },
     { path: "/crop-analysis", label: "Crop Analysis", icon: "🌱" },
     { path: "/field-mapping", label: "Field Mapping", icon: "🗺️" },
-    { path: "/drone-sprays", label: "Drone Sprays", icon: "🚁" },
+    { path: "/dronesprays", label: "Drone Sprays", icon: "🚁" },
     { path: "/community", label: "Community", icon: "👥" },
   ] : [
     // Non-Farmer Menu (Financier/Buyer)

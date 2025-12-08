@@ -208,7 +208,7 @@ function CropAnalysis() {
     }
 
     if (key === 'vari') {
-      if (value < 0.2) return 'Low vegetation index. Growth may be limited.';
+      if (value < 0.1) return 'Low vegetation index. Growth may be limited.';
       return 'Good vegetation health. Healthy crop growth.';
     }
 

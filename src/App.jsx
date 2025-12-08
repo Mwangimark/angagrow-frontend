@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { isAuthenticated } from "./utils/auth";
 import Profile from "./pages/Profile";
+import DroneSpray from "./pages/DroneSprays";
 
 function App() {
   // Helper function to check auth
