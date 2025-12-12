@@ -8,6 +8,47 @@ function CropAnalysis() {
   const [metrics, setMetrics] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [analysisResults, setAnalysisResults] = useState(null);
+  const [loadingStage, setLoadingStage] = useState(""); // NEW: Track loading stages
+  const [loadingProgress, setLoadingProgress] = useState(0); // NEW: Progress percentage
+
+  // Loading stages with messages and estimated times
+  const loadingStages = {
+    uploading: {
+      message: "Uploading images to server...",
+      subtext: "Preparing files for analysis",
+      icon: "📤",
+      duration: 1000,
+      progress: 25
+    },
+    processing: {
+      message: "Processing images...",
+      subtext: "Extracting vegetation indices",
+      icon: "🔍",
+      duration: 1500,
+      progress: 50
+    },
+    analyzing: {
+      message: "Analyzing crop health...",
+      subtext: "Calculating metrics and predictions",
+      icon: "🌱",
+      duration: 1200,
+      progress: 75
+    },
+    generating: {
+      message: "Generating recommendations...",
+      subtext: "Creating personalized insights",
+      icon: "💡",
+      duration: 800,
+      progress: 95
+    },
+    finalizing: {
+      message: "Finalizing results...",
+      subtext: "Almost there!",
+      icon: "✨",
+      duration: 500,
+      progress: 100
+    }
+  };
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -17,7 +58,31 @@ function CropAnalysis() {
       setPreviews(files.map(file => URL.createObjectURL(file)));
       setMetrics(null);
       setAnalysisResults(null);
+      setLoadingStage("");
+      setLoadingProgress(0);
     }
+  };
+
+  // Simulate progressive loading with stages
+  const simulateLoadingProgression = () => {
+    const stages = Object.keys(loadingStages);
+    let currentStageIndex = 0;
+    
+    const nextStage = () => {
+      if (currentStageIndex < stages.length) {
+        const stage = stages[currentStageIndex];
+        setLoadingStage(stage);
+        setLoadingProgress(loadingStages[stage].progress);
+        
+        currentStageIndex++;
+        
+        if (currentStageIndex < stages.length) {
+          setTimeout(nextStage, loadingStages[stage].duration);
+        }
+      }
+    };
+    
+    nextStage();
   };
 
   // Handle upload/predict
@@ -28,6 +93,11 @@ function CropAnalysis() {
     }
 
     setIsLoading(true);
+    setLoadingStage("uploading");
+    setLoadingProgress(0);
+
+    // Start the progressive loading simulation
+    simulateLoadingProgression();
 
     const formData = new FormData();
     selectedFiles.forEach(file => formData.append("images", file));
@@ -40,6 +110,7 @@ function CropAnalysis() {
 
       console.log("Response Data: ", data);
 
+      // Update metrics with actual data
       setMetrics({
         vari: data.vari ?? 0,
         gli: data.gli ?? 0,
@@ -58,9 +129,16 @@ function CropAnalysis() {
     } catch (error) {
       console.error("UPLOAD ERROR: ", error);
       alert(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+      setLoadingStage("");
+      setLoadingProgress(100);
+      
+      // Brief pause to show completion before hiding loader
+      setTimeout(() => {
+        setLoadingProgress(0);
+      }, 800);
     }
-
-    setIsLoading(false);
   };
 
   // Helper functions for metrics display
@@ -68,9 +146,9 @@ function CropAnalysis() {
     const ranges = {
       'canopy_cover': { min: '0%', max: '100%', optimalMin: 40, optimalMax: 70 },
       'astress_percentage': { min: '0%', max: '100%', optimalMin: 0, optimalMax: 15 },
-      'yield_estimate': { min: '0', max: '10+', optimalMin: 20, optimalMax: 50 },
-      'vari': { min: '-1.0', max: '1.0', optimalMin: 0.2, optimalMax: 1.0 },
-      'gli': { min: '-1.0', max: '1.0', optimalMin: 0.1, optimalMax: 1.0 },
+      'yield_estimate': { min: '0', max: '10+', optimalMin: 2.5, optimalMax: 5 },
+      'vari': { min: '-1.0', max: '1.0', optimalMin: 0, optimalMax: 0.1 },
+      'gli': { min: '-1.0', max: '1.0', optimalMin: -0.5, optimalMax: 0.1 },
       'exg': { min: '0', max: '255', optimalMin: 20, optimalMax: 50 },
       'num_images_processed': { min: '0', max: '100+', optimalMin: 1, optimalMax: 100 }
     };
@@ -98,9 +176,8 @@ function CropAnalysis() {
     const range = getMetricRange(key);
 
     if (value < range.optimalMin) return 'bg-red-500';
-    if (value > range.optimalMax) {
+    if (value < range.optimalMax) {
       if (key.includes('stress')) return 'bg-red-500';
-      if (key.includes('yield')) return 'bg-green-500';
       return 'bg-yellow-500';
     }
     return 'bg-green-500';
@@ -164,18 +241,20 @@ function CropAnalysis() {
     }
 
     if (key.includes('yield_estimate')) {
-      if (value < 20) return 'text-red-600';
-      if (value < 50) return 'text-yellow-600';
+      if (value < 2.5) return 'text-red-600';
+      if (value < 5.0) return 'text-yellow-600';
       return 'text-green-600';
     }
 
     if (key.includes('vari')) {
-      if (value < 0.2) return 'text-red-600';
+      if (value < 0) return 'text-red-600';
+      if (value < 0.1) return 'text-yellow-600';
       return 'text-green-600';
     }
 
     if (key.includes('gli')) {
-      if (value < 0.1) return 'text-red-600';
+      if (value < -0.5) return 'text-red-600';
+      if (value < 0.1) return 'text-yellow-600';
       return 'text-green-600';
     }
 
@@ -292,35 +371,94 @@ function CropAnalysis() {
               </div>
             )}
 
-            {/* Analyze Button */}
+            {/* Enhanced Analyze Button with Loading Stages */}
             <button
               onClick={handleUpload}
               disabled={!selectedFiles.length || isLoading}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${!selectedFiles.length || isLoading
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 relative overflow-hidden ${!selectedFiles.length || isLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 }`}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Analyzing Images...
+                <div className="flex flex-col items-center justify-center">
+                  {/* Loading Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 ease-out"
+                      style={{ width: `${loadingProgress}%` }}
+                    ></div>
+                  </div>
+                  
+                  {/* Stage Display */}
+                  <div className="flex items-center justify-center w-full">
+                    <span className="text-2xl mr-3 animate-pulse">
+                      {loadingStage && loadingStages[loadingStage]?.icon || "⏳"}
+                    </span>
+                    <div className="text-left">
+                      <div className="font-semibold">
+                        {loadingStage && loadingStages[loadingStage]?.message || "Starting analysis..."}
+                      </div>
+                      <div className="text-sm opacity-80 font-normal">
+                        {loadingStage && loadingStages[loadingStage]?.subtext || "Preparing your crop health report"}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Animated Dots */}
+                  <div className="flex mt-2 space-x-1">
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                  </div>
                 </div>
               ) : (
-                'Analyze Crop Health'
+                <div className="flex items-center justify-center">
+                  <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Analyze Crop Health
+                </div>
               )}
             </button>
+
+            {/* Loading Tips - Only shows during analysis */}
+            {isLoading && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl border border-emerald-200">
+                <div className="flex items-start">
+                  <div className="text-emerald-600 mr-3 mt-1">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 mb-1">Analysis in Progress</p>
+                    <p className="text-xs text-gray-600">
+                      Your drone images are being analyzed. This typically takes 30-60 seconds. 
+                      We're calculating vegetation indices, canopy coverage, stress levels, and yield predictions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
           </div>
         </div>
 
         {/* Results Section */}
-        {metrics && (
+        {metrics && !isLoading && (
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">Aggregated Results</h2>
+            {/* Results Header with Animation */}
+            <div className="text-center mb-8 animate-fade-in">
+              <div className="inline-flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-2xl">✅</span>
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-1">Analysis Complete!</h2>
+                  <p className="text-gray-600">Your crop health report is ready</p>
+                </div>
+              </div>
               <p className="text-gray-600">Metrics averaged from {metrics.num_images_processed || selectedFiles.length} uploaded images</p>
               {analysisResults?.session_id && (
                 <p className="text-sm text-gray-500 mt-2">Session ID: {analysisResults.session_id}</p>
@@ -329,12 +467,16 @@ function CropAnalysis() {
 
             {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {Object.entries(metrics).map(([key, value]) => {
+              {Object.entries(metrics).map(([key, value], index) => {
                 // Skip non-numeric metrics for the grid
                 if (key === 'num_images_processed' || typeof value !== 'number') return null;
 
                 return (
-                  <div key={key} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-green-200">
+                  <div 
+                    key={key} 
+                    className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-green-200 animate-fade-up"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
                     <div className="flex items-start justify-between mb-4">
                       <div className="text-2xl">{getMetricIcon(key)}</div>
                       <div className={`text-lg font-bold ${getMetricColor(key, value)}`}>
@@ -371,7 +513,7 @@ function CropAnalysis() {
 
             {/* Images Processed Card */}
             {metrics.num_images_processed && (
-              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl shadow-lg border border-blue-200 mb-8">
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl shadow-lg border border-blue-200 mb-8 animate-fade-in">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">Images Processed</h3>
@@ -386,15 +528,21 @@ function CropAnalysis() {
 
             {/* Recommendations Section */}
             {analysisResults?.recommendations && analysisResults.recommendations.length > 0 && (
-              <div className="mt-12">
+              <div className="mt-12 animate-fade-in">
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-3">AI Recommendations</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-3">Crop Analysis Recommendations</h2>
                   <p className="text-gray-600">Personalized suggestions based on your crop analysis</p>
                 </div>
 
                 <div className="space-y-6">
                   {analysisResults.recommendations.map((rec, index) => (
-                    <RecommendationCard key={index} recommendation={rec} />
+                    <div 
+                      key={index} 
+                      className="animate-fade-up"
+                      style={{ animationDelay: `${index * 150}ms` }}
+                    >
+                      <RecommendationCard recommendation={rec} />
+                    </div>
                   ))}
                 </div>
               </div>
