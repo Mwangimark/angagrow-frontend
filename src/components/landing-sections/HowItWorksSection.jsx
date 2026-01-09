@@ -124,7 +124,7 @@ const HowItWorksSection = () => {
                 Start Free Trial
               </button>
               <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-8 rounded-xl border border-gray-200 transition-all duration-300 hover:shadow-lg">
-                Schedule Demo
+                Scheduled Demo
               </button>
             </div>
           </div>

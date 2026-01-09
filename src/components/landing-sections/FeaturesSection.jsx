@@ -15,6 +15,7 @@ import { GiWaterDrop, GiGrowth } from "react-icons/gi";
 
 // Images
 import monitoringImg from "../../assets/features/monitoring.jpg";
+import StatsBanner from './Statsbanner';
 
 const FeaturesSection = () => {
   const features = [
@@ -223,38 +224,8 @@ const FeaturesSection = () => {
           </div>
           
           {/* Main Banner Content */}
-          <div className="relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 p-10 text-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-              {[
-                { value: "10K+", label: "Active Farms", icon: "🏡", description: "and growing daily" },
-                { value: "40%", label: "Cost Reduction", icon: "💰", description: "average savings" },
-                { value: "500K+", label: "Acres Monitored", icon: "🌾", description: "and counting" },
-                { value: "24/7", label: "Support", icon: "🛠️", description: "always available" },
-              ].map((stat, index) => (
-                <div key={index} className="text-center group">
-                  <div className="text-5xl mb-2 transform group-hover:scale-110 transition-transform duration-300">
-                    {stat.icon}
-                  </div>
-                  <div className="text-4xl font-bold mb-2">{stat.value}</div>
-                  <div className="text-lg font-semibold mb-1">{stat.label}</div>
-                  <div className="text-emerald-100 text-sm">{stat.description}</div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Bottom CTA */}
-            <div className="mt-10 pt-8 border-t border-emerald-500/30 text-center">
-              <p className="text-emerald-100 text-lg mb-4">
-                Ready to join thousands of successful farmers?
-              </p>
-              <button className="bg-white text-emerald-700 hover:bg-gray-100 
-                font-bold px-8 py-3 rounded-xl transition-all duration-300 
-                transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                Start Free Trial Today
-              </button>
-            </div>
-          </div>
+          <StatsBanner/>
+
         </div>
       </div>
     </section>
