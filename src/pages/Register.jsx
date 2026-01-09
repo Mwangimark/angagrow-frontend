@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import LoginRoleSelector from "../components/login/LoginRoleSelector";
 import RegistrationLeftPanel from "../components/registration/RegistrationLeftPanel";
 import RegisterationForm from "../components/registration/RegistrationForm";
+import Footer from "../components/landing-sections/Footer";
+import Navbar from "../components/landing-sections/Navbar";
 
 const Register = () => {
   const [selectedRole, setSelectedRole] = useState("farmer");
 
   return (
+    <>
+    <Navbar />
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 p-4">
       <div className="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
         {/* Left Panel */}
@@ -45,6 +49,8 @@ const Register = () => {
         </div>
       </div>
     </div>
+    <Footer/>
+    </>
   );
 };
 

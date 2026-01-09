@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { isAuthenticated } from "./utils/auth";
 import Profile from "./pages/Profile";
 import DroneSpray from "./pages/DroneSprays";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   // Helper function to check auth
@@ -22,12 +23,9 @@ function App() {
         <Route 
           path="/" 
           element={
-            checkAuth() ? 
-              <Navigate to="/dashboard" replace /> : 
-              <Navigate to="/login" replace />
+            <LandingPage/>
           } 
         />
-
         {/* Public routes - only accessible when NOT logged in */}
         <Route 
           path="/login" 
