@@ -241,7 +241,7 @@ const StatsImpact = () => {
         </h2>
         
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          See how AgaaGrow is transforming agriculture across Africa with measurable results
+          See how AngaGrow is transforming agriculture across Africa with measurable results
         </p>
       </div>
 

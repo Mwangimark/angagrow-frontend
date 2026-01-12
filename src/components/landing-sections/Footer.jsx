@@ -80,7 +80,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3">
                 <FiMail className="text-emerald-400" />
-                <span className="text-gray-400">hello@agnagrow.com</span>
+                <span className="text-gray-400">hello@angagrow.com</span>
               </div>
             </div>
             
