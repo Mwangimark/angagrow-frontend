@@ -319,3 +319,4 @@ const StatsImpact = () => {
 };
 
 export default StatsImpact;
+

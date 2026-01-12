@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// Counter Component with slower speed
-const Counter = ({ end, duration = 10000, suffix = "" }) => { // Increased from 2000 to 4000
+// Enhanced Counter Component with individual scroll detection
+const Counter = ({ end, duration = 10000, suffix = "", icon }) => {
   const [count, setCount] = useState(0);
-  const [isInView, setIsInView] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const counterRef = useRef(null);
-  
+
   const formatNumber = (num) => {
     if (num >= 1000) {
       return num.toLocaleString();
@@ -16,11 +16,29 @@ const Counter = ({ end, duration = 10000, suffix = "" }) => { // Increased from 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true);
+          
+          let start = 0;
+          const increment = end / (duration / 30);
+          
+          const timer = setInterval(() => {
+            start += increment;
+            if (start >= end) {
+              setCount(end);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(start));
+            }
+          }, 30);
+
+          return () => clearInterval(timer);
         }
       },
-      { threshold: 0.5 }
+      { 
+        threshold: 0.5,
+        rootMargin: '0px 0px -50px 0px'
+      }
     );
 
     if (counterRef.current) {
@@ -32,26 +50,7 @@ const Counter = ({ end, duration = 10000, suffix = "" }) => { // Increased from 
         observer.unobserve(counterRef.current);
       }
     };
-  }, []);
-
-  useEffect(() => {
-    if (!isInView) return;
-
-    let start = 0;
-    // Increased interval from 16ms to 30ms for slower animation
-    const increment = end / (duration / 30);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 30); // Increased from 16ms to 30ms
-
-    return () => clearInterval(timer);
-  }, [end, duration, isInView]);
+  }, [end, duration, hasStarted]);
 
   return (
     <div ref={counterRef} className="text-4xl font-bold mb-2">
@@ -68,7 +67,7 @@ const StatsBanner = () => {
       icon: "🏡", 
       description: "and growing daily",
       suffix: "+",
-      duration: 4000, // Slowed down: was 2000
+      duration: 4000,
       iconBg: "bg-emerald-500/20",
       iconColor: "text-emerald-300"
     },
@@ -78,7 +77,7 @@ const StatsBanner = () => {
       icon: "💰", 
       description: "average savings",
       suffix: "%",
-      duration: 2500, // Slowed down: was 1500
+      duration: 2500,
       iconBg: "bg-teal-500/20",
       iconColor: "text-teal-300"
     },
@@ -88,7 +87,7 @@ const StatsBanner = () => {
       icon: "🌾", 
       description: "and counting",
       suffix: "+",
-      duration: 5000, // Slowed down: was 2500
+      duration: 5000,
       iconBg: "bg-green-500/20",
       iconColor: "text-green-300"
     },
@@ -98,7 +97,7 @@ const StatsBanner = () => {
       icon: "🛠️", 
       description: "always available",
       suffix: "/7",
-      duration: 2000, // Slowed down: was 1000
+      duration: 2000,
       iconBg: "bg-cyan-500/20",
       iconColor: "text-cyan-300"
     },
@@ -130,11 +129,12 @@ const StatsBanner = () => {
                 <span className="text-3xl">{stat.icon}</span>
               </div>
               
-              {/* Animated Counter - Now Slower */}
+              {/* Animated Counter - Now triggered individually on scroll */}
               <Counter 
                 end={stat.value} 
                 duration={stat.duration}
                 suffix={stat.suffix}
+                icon={stat.icon}
               />
               
               {/* Label with underline effect */}

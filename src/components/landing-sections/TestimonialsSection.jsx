@@ -1,5 +1,5 @@
-import React from 'react';
-import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import React, { useEffect, useState } from 'react';
+import { FiStar } from 'react-icons/fi';
 import { FaQuoteLeft } from 'react-icons/fa';
 
 const TestimonialsSection = () => {
@@ -25,7 +25,7 @@ const TestimonialsSection = () => {
     {
       name: "David Omondi",
       role: "Dairy & Crops Farmer, Meru",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w-150",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
       quote: "The integrated system helped me optimize both my dairy and crop operations. My overall income increased by KES 800,000 annually.",
       rating: 5,
       farmSize: "80 Acres",
@@ -42,18 +42,26 @@ const TestimonialsSection = () => {
     }
   ];
 
-  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const nextTestimonial = () => {
-    setActiveIndex((prev) => (prev + 1) % testimonials.length);
-  };
+  // Auto-rotation effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      
+      // Start transition
+      setTimeout(() => {
+        setActiveIndex((prev) => (prev + 1) % testimonials.length);
+        setIsTransitioning(false);
+      }, 300); // Transition duration
+    }, 5000); // Change every 5 seconds
 
-  const prevTestimonial = () => {
-    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-10 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -65,9 +73,13 @@ const TestimonialsSection = () => {
           </p>
         </div>
 
-        {/* Main Testimonial */}
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl">
+        {/* Main Testimonial Container */}
+        <div className="max-w-4xl mx-auto overflow-hidden">
+          <div className={`bg-white rounded-3xl p-8 md:p-12 shadow-2xl transform transition-all duration-500 ease-in-out ${
+            isTransitioning 
+              ? '-translate-x-full opacity-0' 
+              : 'translate-x-0 opacity-100'
+          }`}>
             {/* Quote Icon */}
             <div className="text-emerald-500 mb-6">
               <FaQuoteLeft className="text-4xl" />
@@ -129,53 +141,23 @@ const TestimonialsSection = () => {
           
           {/* Navigation */}
           <div className="flex justify-center items-center gap-6 mt-8">
-            <button 
-              onClick={prevTestimonial}
-              className="p-3 rounded-full bg-white border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300"
-            >
-              <FiChevronLeft className="text-xl text-gray-600 hover:text-emerald-600" />
-            </button>
-            
-            {/* Dots */}
+            {/* Dots only */}
             <div className="flex gap-2">
               {testimonials.map((_, index) => (
-                <button
+                <div
                   key={index}
-                  onClick={() => setActiveIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  className={`w-3 h-3 rounded-full transition-all duration-500 ${
                     index === activeIndex 
                       ? 'bg-emerald-500 w-8' 
-                      : 'bg-gray-300 hover:bg-gray-400'
+                      : 'bg-gray-300'
                   }`}
                 />
               ))}
             </div>
-            
-            <button 
-              onClick={nextTestimonial}
-              className="p-3 rounded-full bg-white border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300"
-            >
-              <FiChevronRight className="text-xl text-gray-600 hover:text-emerald-600" />
-            </button>
           </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20">
-          {[
-            { value: "98%", label: "Satisfaction Rate", color: "text-emerald-600" },
-            { value: "4.9/5", label: "Average Rating", color: "text-amber-600" },
-            { value: "10K+", label: "Active Users", color: "text-blue-600" },
-            { value: "95%", label: "Would Recommend", color: "text-teal-600" },
-          ].map((stat, index) => (
-            <div key={index} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-              <div className={`text-4xl font-bold ${stat.color} mb-2`}>{stat.value}</div>
-              <div className="text-gray-600">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-        
+        </div>  
       </div>
+      
     </section>
   );
 };

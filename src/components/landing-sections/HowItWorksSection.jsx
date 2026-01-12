@@ -89,7 +89,7 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-24 bg-gradient-to-br from-emerald-50 via-white to-teal-50 overflow-hidden">
+    <section id="how-it-works" className="py-5 bg-gradient-to-br from-emerald-50 via-white to-teal-50 overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-r from-emerald-200/40 to-teal-200/40 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-full blur-3xl"></div>
@@ -120,7 +120,7 @@ const HowItWorksSection = () => {
         {/* Timeline Container */}
         <div className="relative">
           {/* Logo at top center with connecting line */}
-          <div className={`flex justify-center mb-12 transition-all duration-1000 ${
+          <div className={`flex justify-center mb-0 transition-all duration-1000 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-xl border-2 border-emerald-200/50 flex items-center gap-3 group hover:shadow-2xl hover:scale-105 transition-all duration-300 relative">
@@ -207,7 +207,7 @@ const HowItWorksSection = () => {
                     {/* Main Card */}
                     <div className="relative pt-20 lg:pt-48">
                       {/* Icon with animated ring */}
-                      <div className="relative mx-auto w-40 h-40 mb-8">
+                      <div className="relative mx-auto w-40 h-40 mb-0">
                         {/* Outer glow effect on hover */}
                         <div className={`absolute inset-0 rounded-full blur-xl transition-opacity duration-500 ${
                           isHovered ? 'opacity-40' : 'opacity-0'
@@ -347,7 +347,7 @@ const HowItWorksSection = () => {
         </div>
 
         {/* Bottom CTA Section */}
-        <div className={`mt-20 text-center transition-all duration-1000 ${
+        <div className={`mt-3 text-center transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}>
           <div className="inline-flex items-center gap-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl px-6 py-5 shadow-xl border-2 border-emerald-100">
@@ -365,7 +365,7 @@ const HowItWorksSection = () => {
             <span className="text-gray-700 font-semibold">Hover over steps to explore details</span>
           </div>
         </div>
-      </div>5
+      </div>
     </section>
   );
 };
