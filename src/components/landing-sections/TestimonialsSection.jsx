@@ -174,6 +174,7 @@ const TestimonialsSection = () => {
             </div>
           ))}
         </div>
+        
       </div>
     </section>
   );

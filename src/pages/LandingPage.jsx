@@ -7,6 +7,7 @@ import HowItWorksSection from '../components/landing-sections/HowItWorksSection'
 import TestimonialsSection from '../components/landing-sections/TestimonialsSection';
 import StatsSection from '../components/landing-sections/StatsSection';
 import CTASection from '../components/landing-sections/CTASection';
+import StatsImpact from '../components/landing-sections/StatsImpact';
 
 const LandingPage = () => {
   return (
@@ -25,6 +26,9 @@ const LandingPage = () => {
       
       {/* Testimonials Section */}
       <TestimonialsSection />
+
+      {/* Stats Impact Section */}
+      <StatsImpact />
       
       {/* Stats Section */}
       <StatsSection />
