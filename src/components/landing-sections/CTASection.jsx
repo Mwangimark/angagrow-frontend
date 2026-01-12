@@ -40,7 +40,7 @@ const CTASection = () => {
               
               <p className="text-xl text-emerald-100 mb-8">
                 Join thousands of successful farmers who have already transformed 
-                their operations with AgnaGrow. It's time to grow smarter.
+                their operations with AngaGrow. It's time to grow smarter.
               </p>
               
               {/* Benefits List */}
@@ -70,7 +70,7 @@ const CTASection = () => {
                   </div>
                   <div>
                     <div className="text-sm text-emerald-200">Email Us</div>
-                    <div className="font-semibold">hello@agnagrow.com</div>
+                    <div className="font-semibold">hello@angagrow.com</div>
                   </div>
                 </div>
               </div>

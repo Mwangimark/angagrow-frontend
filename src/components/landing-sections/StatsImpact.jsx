@@ -212,6 +212,7 @@ const StatsImpact = () => {
   return (
     <div ref={containerRef} className="container mx-auto px-4 py-16">
       <div className="text-center max-w-3xl mx-auto mb-16">
+
         
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
           Making an Impact 
@@ -223,7 +224,7 @@ const StatsImpact = () => {
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path 
+              <path  
                 d="M0,5 Q100,15 200,5" 
                 stroke="url(#gradient)" 
                 strokeWidth="3" 
@@ -319,4 +320,3 @@ const StatsImpact = () => {
 };
 
 export default StatsImpact;
-

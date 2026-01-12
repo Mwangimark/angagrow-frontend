@@ -4,15 +4,15 @@ import farmhero from "../../assets/farm-hero.png";
 
 const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50">
-      
+    <section className="relative overflow-hidden bg-gradient-to-br from-green-50 via-lime-50 to-emerald-100">
+
       {/* Soft background blobs */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-emerald-200/50 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-teal-200/50 rounded-full blur-3xl"></div>
+      <div className="absolute top-24 left-16 w-80 h-80 bg-green-300/40 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-24 right-16 w-80 h-80 bg-lime-300/40 rounded-full blur-3xl"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
 
-        {/* LEFT CONTENT */}
+        {/* LEFT CONTENTu */}
         <div>
           <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
             <FaLeaf />

@@ -15,7 +15,7 @@ const Footer = () => {
                 <FaLeaf className="text-white text-2xl" />
               </div>
               <div className="text-2xl font-bold">
-                Agna<span className="text-emerald-400">Grow</span>
+                Anga<span className="text-emerald-400">Grow</span>
               </div>
             </div>
             <p className="text-gray-400 mb-6">
@@ -104,7 +104,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} AgnaGrow. All rights reserved.
+            © {new Date().getFullYear()} AngaGrow. All rights reserved.
           </div>
           <div className="flex gap-6 mt-4 md:mt-0">
             <a href="#" className="text-gray-400 hover:text-emerald-400 text-sm">Privacy Policy</a>
