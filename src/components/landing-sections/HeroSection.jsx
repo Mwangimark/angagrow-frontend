@@ -10,10 +10,11 @@ const HeroSection = () => {
       <div className="absolute top-24 left-16 w-80 h-80 bg-green-300/40 rounded-full blur-3xl"></div>
       <div className="absolute bottom-24 right-16 w-80 h-80 bg-lime-300/40 rounded-full blur-3xl"></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
 
         {/* LEFT CONTENTu */}
-        <div>
+        <div className="lg:col-span-5">
+
           <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
             <FaLeaf />
             Smart Agriculture Platform
@@ -61,14 +62,17 @@ const HeroSection = () => {
         </div>
 
         {/* RIGHT CONTENT */}
-        <div className="relative">
-          <div className="rounded-3xl overflow-hidden shadow-2xl">
+        <div className="relative lg:col-span-7">
+
+          <div className="rounded-3xl overflow-hidden shadow-2xl w-full aspect-[4/3] bg-black/5">
             <img
               src={farmhero}
               alt="Smart farming with AngaGrow"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
             />
           </div>
+
+
 
           {/* Floating card */}
           <div className="absolute -bottom-8 left-8 bg-white rounded-2xl p-5 shadow-xl">
