@@ -103,7 +103,7 @@ function CropAnalysis() {
     selectedFiles.forEach(file => formData.append("images", file));
 
     try {
-      const data = await fetchWithAuth("http://127.0.0.1:8000/api/crop-analysis/", {
+      const data = await fetchWithAuth(`${process.env.REACT_APP_API_BASE_URL}/api/crop-analysis/`, {
         method: "POST",
         body: formData,
       });

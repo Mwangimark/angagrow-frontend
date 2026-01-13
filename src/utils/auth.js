@@ -50,7 +50,7 @@ export const logout = async () => {
         // Only call logout API if we have tokens
         if (refreshToken && accessToken) {
             try {
-                const response = await fetch('http://localhost:8000/accounts/logout/', {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/logout/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export const refreshAccessToken = async () => {
             return null;
         }
 
-        const response = await fetch('http://localhost:8000/accounts/token/refresh/', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/token/refresh/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
