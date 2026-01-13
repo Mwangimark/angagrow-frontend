@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const RegistrationForm = ({ selectedRole }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -406,9 +407,9 @@ const RegistrationForm = ({ selectedRole }) => {
             <div className="mt-6 text-center">
                 <p className="text-gray-600 text-sm">
                     Already have an account?{' '}
-                    <a href="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors duration-200">
+                    <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors duration-200">
                         Sign in here
-                    </a>
+                    </Link>
                 </p>
             </div>
         </>
