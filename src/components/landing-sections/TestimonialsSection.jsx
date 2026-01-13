@@ -17,7 +17,7 @@ const TestimonialsSection = () => {
       quote: "AngaGrow helped me increase my maize yield by 65% in just one season. The smart irrigation system alone saved me KES 120,000 in water costs.",
       rating: 5,
       farmSize: "50 Acres",
-      improvement: "+65% Yield"
+      improvement: "+15% Yield"
     },
     {
       name: "Sarah Wanjiku",
@@ -26,7 +26,7 @@ const TestimonialsSection = () => {
       quote: "The market insights feature connected me directly with exporters. I now get 40% better prices for my coffee beans.",
       rating: 5,
       farmSize: "25 Acres",
-      improvement: "+40% Profit"
+      improvement: "+17% Profit"
     },
     {
       name: "David Omondi",
@@ -35,7 +35,7 @@ const TestimonialsSection = () => {
       quote: "The integrated system helped me optimize both my dairy and crop operations. My overall income increased by KES 800,000 annually.",
       rating: 5,
       farmSize: "80 Acres",
-      improvement: "+55% Income"
+      improvement: "+12% Income"
     },
     {
       name: "Grace Muthoni",
@@ -44,7 +44,7 @@ const TestimonialsSection = () => {
       quote: "Real-time monitoring and AI predictions helped me prevent crop diseases before they spread. Saved my entire flower farm.",
       rating: 5,
       farmSize: "15 Acres",
-      improvement: "100% Saved"
+      improvement: "18% Saved"
     },
     {
       name: "James Kariuki",
@@ -53,7 +53,7 @@ const TestimonialsSection = () => {
       quote: "With AngaGrow's weather predictions, I've reduced crop losses by 80% during rainy seasons. Revolutionary technology!",
       rating: 5,
       farmSize: "30 Acres",
-      improvement: "+45% Quality"
+      improvement: "+15% Quality"
     },
     {
       name: "Mary Atieno",
@@ -62,7 +62,7 @@ const TestimonialsSection = () => {
       quote: "The export market access through AngaGrow doubled my avocado sales to European markets. Life-changing platform!",
       rating: 5,
       farmSize: "40 Acres",
-      improvement: "+110% Revenue"
+      improvement: "+20% Revenue"
     }
   ];
 

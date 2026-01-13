@@ -62,7 +62,7 @@ const Counter = ({ end, duration = 10000, suffix = "", icon }) => {
 const StatsBanner = () => {
   const stats = [
     { 
-      value: 10000, 
+      value: 10, 
       label: "Active Farms", 
       icon: "🏡", 
       description: "and growing daily",
@@ -72,7 +72,7 @@ const StatsBanner = () => {
       iconColor: "text-emerald-300"
     },
     { 
-      value: 40, 
+      value: 18, 
       label: "Cost Reduction", 
       icon: "💰", 
       description: "average savings",
@@ -82,7 +82,7 @@ const StatsBanner = () => {
       iconColor: "text-teal-300"
     },
     { 
-      value: 500000, 
+      value: 5000, 
       label: "Acres Monitored", 
       icon: "🌾", 
       description: "and counting",

@@ -16,6 +16,7 @@ import { GiWaterDrop, GiGrowth } from "react-icons/gi";
 // Images
 import monitoringImg from "../../assets/features/monitoring.jpg";
 import StatsBanner from './Statsbanner';
+import precision from '../../assets/features/precision.png';
 
 const FeaturesSection = () => {
   const features = [
@@ -34,7 +35,7 @@ const FeaturesSection = () => {
       title: "Precision Irrigation",
       description: "Automated watering optimized by soil moisture and weather data.",
       icon: <FiDroplet className="text-xl" />,
-      image: "https://images.unsplash.com/photo-1628746406382-1a1d8edf6c71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: precision,
       stat: "Save 40% Water",
       color: "from-blue-500 to-cyan-500",
       bgColor: "bg-blue-50",
