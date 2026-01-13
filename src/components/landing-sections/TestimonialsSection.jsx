@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { FiStar } from 'react-icons/fi';
 import { FaQuoteLeft } from 'react-icons/fa';
+import image1 from '../../assets/testimonials/image copy.png';
+import image2 from '../../assets/testimonials/image copy 2.png';
+import image3 from '../../assets/testimonials/image copy 3.png';
+import image4 from '../../assets/testimonials/image copy 4.png';
+import image5 from '../../assets/testimonials/image copy 5.png';
+import image6 from '../../assets/testimonials/image copy 6.png';
 
 const TestimonialsSection = () => {
   const testimonials = [
     {
       name: "John Kamau",
       role: "Maize Farmer, Nakuru",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      image: image4,
       quote: "AngaGrow helped me increase my maize yield by 65% in just one season. The smart irrigation system alone saved me KES 120,000 in water costs.",
       rating: 5,
       farmSize: "50 Acres",
@@ -16,7 +22,7 @@ const TestimonialsSection = () => {
     {
       name: "Sarah Wanjiku",
       role: "Coffee Farmer, Kiambu",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150",
+      image: image5, // African woman face
       quote: "The market insights feature connected me directly with exporters. I now get 40% better prices for my coffee beans.",
       rating: 5,
       farmSize: "25 Acres",
@@ -25,7 +31,7 @@ const TestimonialsSection = () => {
     {
       name: "David Omondi",
       role: "Dairy & Crops Farmer, Meru",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      image: image3, // African man smiling
       quote: "The integrated system helped me optimize both my dairy and crop operations. My overall income increased by KES 800,000 annually.",
       rating: 5,
       farmSize: "80 Acres",
@@ -34,11 +40,29 @@ const TestimonialsSection = () => {
     {
       name: "Grace Muthoni",
       role: "Horticulture Farmer, Naivasha",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+      image: image1, // African woman portrait
       quote: "Real-time monitoring and AI predictions helped me prevent crop diseases before they spread. Saved my entire flower farm.",
       rating: 5,
       farmSize: "15 Acres",
       improvement: "100% Saved"
+    },
+    {
+      name: "James Kariuki",
+      role: "Tea Farmer, Kericho",
+      image: image2, 
+      quote: "With AngaGrow's weather predictions, I've reduced crop losses by 80% during rainy seasons. Revolutionary technology!",
+      rating: 5,
+      farmSize: "30 Acres",
+      improvement: "+45% Quality"
+    },
+    {
+      name: "Mary Atieno",
+      role: "Avocado Farmer, Murang'a",
+      image: image6, // African woman professional
+      quote: "The export market access through AngaGrow doubled my avocado sales to European markets. Life-changing platform!",
+      rating: 5,
+      farmSize: "40 Acres",
+      improvement: "+110% Revenue"
     }
   ];
 
