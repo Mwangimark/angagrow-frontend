@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 import { FaLeaf } from 'react-icons/fa';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import logo from '../../assets/angagrow_logo.png';
+import imglogo from '../../assets/logo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,14 +15,11 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link to="/" className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl">
-                <FaLeaf className="text-white text-2xl" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900">
-                Anga<span className="text-emerald-600">Grow</span>
-              </div>
+              <img src={imglogo} alt="AngaGrow Logo" className="h-12 object-contain" />
+              <div className="text-2xl font-bold text-gray-900"> Anga Grow </div>
             </Link>
           </div>
+
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
@@ -43,13 +42,13 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="text-gray-700 hover:text-emerald-600 font-medium py-2 px-4"
             >
               Log In
             </Link>
-            <Link 
+            <Link
               to="/signup"
               className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
             >
@@ -58,7 +57,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-gray-700 p-2"
           >
@@ -70,50 +69,50 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col gap-4">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-emerald-600 font-medium py-2"
               >
                 Home
               </Link>
-              <a 
-                href="#features" 
+              <a
+                href="#features"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-emerald-600 font-medium py-2"
               >
                 Features
               </a>
-              <a 
-                href="#how-it-works" 
+              <a
+                href="#how-it-works"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-emerald-600 font-medium py-2"
               >
                 How It Works
               </a>
-              <a 
-                href="#pricing" 
+              <a
+                href="#pricing"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-emerald-600 font-medium py-2"
               >
                 Pricing
               </a>
-              <a 
-                href="#about" 
+              <a
+                href="#about"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-emerald-600 font-medium py-2"
               >
                 About
               </a>
               <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   onClick={() => setIsOpen(false)}
                   className="text-gray-700 hover:text-emerald-600 font-medium py-3 text-center"
                 >
                   Log In
                 </Link>
-                <Link 
+                <Link
                   to="/signup"
                   onClick={() => setIsOpen(false)}
                   className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 rounded-xl text-center"

@@ -1,21 +1,23 @@
 import React from 'react';
 import { FaLeaf, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { Link } from 'react-router-dom'; 
+import imglogo from '../../assets/logo.png';
 
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
+
           {/* Company Info */}
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl">
-                <FaLeaf className="text-white text-2xl" />
-              </div>
+              <Link to="/" className="flex items-center gap-2">
+                <img src={imglogo} alt="AngaGrow Logo" className="h-12 object-contain" />
+              </Link>
               <div className="text-2xl font-bold">
-                Anga<span className="text-emerald-400">Grow</span>
+                Anga Grow
               </div>
             </div>
             <p className="text-gray-400 mb-6">
@@ -83,13 +85,13 @@ const Footer = () => {
                 <span className="text-gray-400">hello@angagrow.com</span>
               </div>
             </div>
-            
+
             {/* Newsletter */}
             <div className="mt-8">
               <h4 className="font-bold mb-3">Stay Updated</h4>
               <div className="flex">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   placeholder="Your email"
                   className="flex-1 px-4 py-2 rounded-l-lg bg-gray-800 border border-gray-700 text-white outline-none"
                 />

@@ -15,7 +15,7 @@ const Navbar = () => {
               <FaLeaf className="text-white text-2xl" />
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              Agna<span className="text-emerald-600">Grow</span>
+              Anga<span className="text-emerald-600">Grow</span>
             </div>
           </div>
 
