@@ -51,7 +51,7 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
 
       try {
         // Call the login API
-        const response = await fetch('http://localhost:8000/accounts/login/', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/login/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

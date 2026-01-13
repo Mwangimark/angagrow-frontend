@@ -8,7 +8,7 @@ const TestimonialsSection = () => {
       name: "John Kamau",
       role: "Maize Farmer, Nakuru",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-      quote: "AgnaGrow helped me increase my maize yield by 65% in just one season. The smart irrigation system alone saved me KES 120,000 in water costs.",
+      quote: "AngaGrow helped me increase my maize yield by 65% in just one season. The smart irrigation system alone saved me KES 120,000 in water costs.",
       rating: 5,
       farmSize: "50 Acres",
       improvement: "+65% Yield"

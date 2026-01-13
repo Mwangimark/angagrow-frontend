@@ -10,9 +10,12 @@ const RegistrationForm = ({ selectedRole }) => {
         phone: '',
         password: '',
         role: selectedRole,  // Added role to formData
+        confirm_password: '',
     });
     const [errors, setErrors] = useState({});
     const [passwordStrength, setPasswordStrength] = useState(0);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const checkPasswordStrength = (pass) => {
         let strength = 0;
@@ -25,7 +28,7 @@ const RegistrationForm = ({ selectedRole }) => {
 
     const handleRegister = async (data) => {
         try {
-            const response = await fetch('http://localhost:8000/accounts/register/', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,8 +42,8 @@ const RegistrationForm = ({ selectedRole }) => {
                 if (errorData) {
                     const backendErrors = {};
                     Object.keys(errorData).forEach(key => {
-                        backendErrors[key] = Array.isArray(errorData[key]) 
-                            ? errorData[key].join(' ') 
+                        backendErrors[key] = Array.isArray(errorData[key])
+                            ? errorData[key].join(' ')
                             : errorData[key];
                     });
                     setErrors(backendErrors);
@@ -99,7 +102,7 @@ const RegistrationForm = ({ selectedRole }) => {
 
         if (Object.keys(validationErrors).length === 0) {
             setIsLoading(true);
-            
+
             // Include role in submission data
             const submissionData = {
                 ...formData,
@@ -107,7 +110,7 @@ const RegistrationForm = ({ selectedRole }) => {
             };
 
             // Remove confirmPassword from submission as backend doesn't expect it
-            delete submissionData.confirmPassword;
+            delete submissionData.confirm_password;
 
             await handleRegister(submissionData);
             setIsLoading(false);
@@ -140,6 +143,11 @@ const RegistrationForm = ({ selectedRole }) => {
             newErrors.password = 'Password must be at least 6 characters';
         } else if (passwordStrength < 3) {
             newErrors.password = 'Password is too weak';
+        }
+        if (!formData.confirm_password) {
+            newErrors.confirm_password = 'Please confirm your password';
+        } else if (formData.password !== formData.confirm_password) {
+            newErrors.confirm_password = 'Passwords do not match';
         }
 
         return newErrors;
@@ -268,13 +276,13 @@ const RegistrationForm = ({ selectedRole }) => {
                 </div>
 
                 {/* Password */}
-                <div>
+                <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Password *
                     </label>
                     <input
                         name="password"
-                        type="password"
+                        type={showPassword?"text":"password"}
                         value={formData.password}
                         onChange={handleChange}
                         className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
@@ -282,6 +290,16 @@ const RegistrationForm = ({ selectedRole }) => {
                         placeholder="••••••••"
                         minLength="6"
                     />
+
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(prev => !prev)}
+                        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-emerald-600"
+                        tabIndex={-1}
+                    >
+                        {showPassword ? "🙈" : "👁️"}
+                    </button>
+
 
                     {/* Password Strength */}
                     {formData.password && (
@@ -301,6 +319,37 @@ const RegistrationForm = ({ selectedRole }) => {
 
                     {errors.password && (
                         <p className="mt-1 text-xs text-red-600">{errors.password}</p>
+                    )}
+                </div>
+
+                {/* Confirm Password */}
+                <div className="relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirm Password *
+                    </label>
+                    <input
+                        name="confirm_password"
+                        type={showConfirmPassword?"text":"password"}
+                        value={formData.confirm_password}
+                        onChange={handleChange}
+                        className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.confirm_password
+                            ? 'border-red-300 focus:ring-red-500'
+                            : 'border-gray-300 focus:ring-emerald-500'
+                            }`}
+                        placeholder="••••••••"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(prev => !prev)}
+                        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-emerald-600"
+                        tabIndex={-1}
+                    >
+                        {showConfirmPassword ? "🙈" : "👁️"}
+                    </button>
+                    {errors.confirm_password && (
+                        <p className="mt-1 text-xs text-red-600">
+                            {errors.confirm_password}
+                        </p>
                     )}
                 </div>
 
