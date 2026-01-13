@@ -84,7 +84,7 @@ const StatsImpact = () => {
       label: "Average Yield Increase",
       change: "Industry leading",
       color: "from-purple-500 to-pink-500",
-      description: "For AgnaGrow users",
+      description: "For AngaGRow users",
       duration: 1500,
       ease: "power2.out"
     },
