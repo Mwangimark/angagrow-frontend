@@ -70,7 +70,7 @@ function ChatbotFloating() {
     }
     
     try {
-      const response = await fetchWithAuth("http://127.0.0.1:8000/api/chatbot/", {
+      const response = await fetchWithAuth(`${process.env.REACT_APP_API_BASE_URL}/bot/chatbot/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
