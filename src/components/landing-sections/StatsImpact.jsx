@@ -10,7 +10,7 @@ const StatsImpact = () => {
   // Parse numbers from values
   const parseNumber = (value) => {
     if (value.includes('KES')) {
-      return parseFloat(value.replace('KES ', '').replace('B', '').trim()) * 1000000000;
+      return parseFloat(value.replace('KES ', '').replace('', '').trim()) * 1000000000;
     } else if (value.includes('+')) {
       return parseFloat(value.replace(',', '').replace('+', ''));
     } else if (value.includes('%')) {
@@ -27,8 +27,8 @@ const StatsImpact = () => {
   // Format numbers back to display format
   const formatNumber = (value, original) => {
     if (original.includes('KES')) {
-      const billions = value / 1000000000;
-      return `KES ${billions.toFixed(billions >= 10 ? 0 : 1)}B`;
+      const billions = value / 1000000;
+      return `KES ${billions.toFixed(billions >= 10 ? 0 : 1)}M+`;
     } else if (original.includes('+')) {
       return `${Math.floor(value).toLocaleString()}+`;
     } else if (original.includes('%')) {
@@ -46,8 +46,8 @@ const StatsImpact = () => {
   const statsData = [
     {
       icon: <FaSeedling className="text-3xl" />,
-      value: "10+",
-      numericValue: 10,
+      value: "3+",
+      numericValue: 3,
       label: "Active Farms",
       change: "+25% this year",
       color: "from-emerald-500 to-green-500",
@@ -57,8 +57,8 @@ const StatsImpact = () => {
     },
     {
       icon: <FiTrendingUp className="text-3xl" />,
-      value: "KES 2.5B",
-      numericValue: 2500000000, 
+      value: "KES 200M+",
+      numericValue: 200000000, // 200 million
       label: "Farmer Revenue",
       change: "+20% growth",
       color: "from-amber-500 to-orange-500",
@@ -68,9 +68,9 @@ const StatsImpact = () => {
     },
     {
       icon: <FiUsers className="text-3xl" />,
-      value: "500+",
-      numericValue: 500,
-      label: "Farmers Empowered",
+      value: "20+",
+      numericValue: 20,
+      label: "Farm Staff Empowered (Across Kenya)",
       change: "+15,000 new users",
       color: "from-blue-500 to-cyan-500",
       description: "Across East Africa",
@@ -79,8 +79,8 @@ const StatsImpact = () => {
     },
     {
       icon: <FaChartLine className="text-3xl" />,
-      value: "20%",
-      numericValue: 20,
+      value: "19%",
+      numericValue: 19,
       label: "Average Yield Increase",
       change: "Industry leading",
       color: "from-purple-500 to-pink-500",
@@ -112,8 +112,8 @@ const StatsImpact = () => {
     },
     {
       icon: <FiGlobe className="text-3xl" />,
-      value: "8",
-      numericValue: 8,
+      value: "1",
+      numericValue: 1,
       label: "Countries",
       change: "Expanding globally",
       color: "from-indigo-500 to-blue-500",
