@@ -1,3 +1,5 @@
+import axios from "axios";
+
 // utils/api.js
 export const fetchWithAuth = async (url, options = {}) => {
   const token = localStorage.getItem('access_token');
@@ -36,3 +38,17 @@ export const fetchWithAuth = async (url, options = {}) => {
 
   return response.json();
 };
+
+const api = axios.create({
+  baseURL: "http://localhost:8000/api", // adjust if needed
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;

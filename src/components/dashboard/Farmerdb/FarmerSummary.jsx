@@ -1,11 +1,11 @@
 // FarmerSummary.jsx
 import React from 'react';
-import { 
-  FaChartLine, 
-  FaMoneyBillWave, 
-  FaShoppingCart, 
-  FaSeedling, 
-  FaChartPie, 
+import {
+  FaChartLine,
+  FaMoneyBillWave,
+  FaShoppingCart,
+  FaSeedling,
+  FaChartPie,
   FaCheckCircle,
   FaLeaf,
   FaTractor,
@@ -19,9 +19,14 @@ import {
 import { GiFruitTree, GiWheat } from 'react-icons/gi';
 import { MdTrendingUp, MdLocalOffer } from 'react-icons/md';
 
+
 const FarmerSummary = () => {
+  
+
   return (
     <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-3xl shadow-2xl font-sans">
+
+      
 
       {/* Main Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -30,7 +35,7 @@ const FarmerSummary = () => {
         <div className="relative bg-gradient-to-br from-green-500 via-emerald-500 to-green-600 text-white p-6 rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl">
           <div className="absolute top-4 right-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
           <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/5 rounded-full blur-lg"></div>
-          
+
           <div className="flex items-center justify-between mb-3 relative z-10">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
@@ -53,7 +58,7 @@ const FarmerSummary = () => {
         {/* Total Est. Value of Yield (Grey Inactive Card) */}
         <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 p-6 text-gray-800 rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
           <div className="absolute top-4 right-4 w-24 h-24 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full blur-xl"></div>
-          
+
           <div className="flex items-center justify-between mb-3 relative z-10">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl">
@@ -86,14 +91,14 @@ const FarmerSummary = () => {
           {/* Harvest Highlights */}
           <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 p-6 rounded-3xl shadow-lg border border-amber-200/60 transform transition-all duration-300 hover:shadow-xl">
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full -mr-6 -mt-6 blur-md"></div>
-            
+
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-gradient-to-br from-amber-400 to-orange-400 rounded-2xl shadow-md">
                 <FaShoppingCart className="text-2xl text-white" />
               </div>
               <h3 className="font-bold text-gray-800 text-xl">Harvest Highlights</h3>
             </div>
-            
+
             <ul className="space-y-4 text-gray-700">
               <li className="flex items-start gap-3 p-3 bg-white/50 rounded-xl">
                 <FaUsers className="text-amber-500 text-xl mt-1 flex-shrink-0" />
@@ -219,14 +224,14 @@ const FarmerSummary = () => {
           {/* Current Cycle Highlights */}
           <div className="relative bg-gradient-to-br from-indigo-50 via-blue-50 to-indigo-100 p-6 rounded-3xl border border-indigo-200/60 shadow-lg transform transition-all duration-300 hover:shadow-xl">
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-indigo-200 to-blue-200 rounded-full -mr-6 -mt-6 blur-md"></div>
-            
+
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-2xl shadow-md">
                 <FaLeaf className="text-2xl text-white" />
               </div>
               <h3 className="font-bold text-gray-800 text-xl">Current Cycle</h3>
             </div>
-            
+
             <ul className="space-y-4">
               <li className="flex items-start gap-3 p-3 bg-white/50 rounded-xl">
                 <div className="p-2 bg-indigo-100 rounded-lg">
@@ -262,14 +267,14 @@ const FarmerSummary = () => {
           <div className="relative bg-gradient-to-br from-emerald-500 via-green-500 to-emerald-600 text-white p-6 rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl">
             <div className="absolute top-4 right-4 w-24 h-24 bg-white/15 rounded-full blur-xl"></div>
             <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-white/10 rounded-full blur-lg"></div>
-            
+
             <div className="flex items-center gap-3 mb-4 relative z-10">
               <div className="p-3 bg-white/25 rounded-2xl backdrop-blur-sm">
                 <FaTractor className="text-2xl" />
               </div>
               <h3 className="font-bold text-xl">Crops Analysis</h3>
             </div>
-            
+
             <div className="text-4xl font-black relative z-10 mb-2 tracking-tight">60 HA</div>
             <div className="text-xl font-bold text-emerald-100 relative z-10 mb-4 flex items-center gap-2">
               <FaMoneyBillWave />
@@ -286,14 +291,14 @@ const FarmerSummary = () => {
             <div className="absolute top-4 right-4 p-3 bg-gradient-to-br from-teal-200 to-cyan-200 rounded-full">
               <FaSprayCan className="text-teal-600 text-xl" />
             </div>
-            
+
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-xl">
                 <FaSprayCan className="text-white text-xl" />
               </div>
               <h3 className="font-bold text-gray-800 text-xl">Sprays Done</h3>
             </div>
-            
+
             <div className="text-4xl font-black text-gray-900 mb-2">20 Sprays</div>
             <div className="text-xl font-bold text-teal-700 mb-4 flex items-center gap-2">
               <FaMoneyBillWave />

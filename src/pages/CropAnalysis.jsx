@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import RecommendationCard from "../components/RecommendationCard";
 import { fetchWithAuth } from "../utils/apis";
+import PlantVigorAnalysis from "../components/cropanalysis/PlantVigorAnalysis";
+import FarmBlockSelector from "../components/cropanalysis/FarmBlockSelector";
+
+
 
 function CropAnalysis() {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -10,11 +14,13 @@ function CropAnalysis() {
   const [analysisResults, setAnalysisResults] = useState(null);
   const [loadingStage, setLoadingStage] = useState(""); // NEW: Track loading stages
   const [loadingProgress, setLoadingProgress] = useState(0); // NEW: Progress percentage
+  const [selectedFarm, setSelectedFarm] = useState(null);
+  const [selectedBlock, setSelectedBlock] = useState(null);
 
   // Loading stages with messages and estimated times
   const loadingStages = {
     uploading: {
-      message: "Uploading images to server...",
+      message: "UploadinFg images to server...",
       subtext: "Preparing files for analysis",
       icon: "📤",
       duration: 1000,
@@ -67,21 +73,21 @@ function CropAnalysis() {
   const simulateLoadingProgression = () => {
     const stages = Object.keys(loadingStages);
     let currentStageIndex = 0;
-    
+
     const nextStage = () => {
       if (currentStageIndex < stages.length) {
         const stage = stages[currentStageIndex];
         setLoadingStage(stage);
         setLoadingProgress(loadingStages[stage].progress);
-        
+
         currentStageIndex++;
-        
+
         if (currentStageIndex < stages.length) {
           setTimeout(nextStage, loadingStages[stage].duration);
         }
       }
     };
-    
+
     nextStage();
   };
 
@@ -108,6 +114,7 @@ function CropAnalysis() {
         body: formData,
       });
 
+
       console.log("Response Data: ", data);
 
       // Update metrics with actual data
@@ -123,7 +130,8 @@ function CropAnalysis() {
 
       setAnalysisResults({
         session_id: data.session_id,
-        recommendations: data.recommendations || []
+        recommendations: data.recommendations || [],
+        vigor: data.vegetation_health,
       });
 
     } catch (error) {
@@ -133,7 +141,7 @@ function CropAnalysis() {
       setIsLoading(false);
       setLoadingStage("");
       setLoadingProgress(100);
-      
+
       // Brief pause to show completion before hiding loader
       setTimeout(() => {
         setLoadingProgress(0);
@@ -315,135 +323,150 @@ function CropAnalysis() {
             Upload drone imagery to get detailed vegetation analysis and yield predictions
           </p>
         </div>
+        <div className="flex flex-col lg:flex-row gap-8 mb-12">
 
-        {/* Upload Section */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 transition-all duration-300 hover:shadow-xl">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Upload Drone Images</h2>
-              <p className="text-gray-600">Supported formats: JPG, PNG, TIFF. You can upload multiple images.</p>
-            </div>
+          {/* NEW: Farm/Block Selection */}
+          <div className="lg:w-1/2">            <FarmBlockSelector
+            onFarmSelect={setSelectedFarm}
+            onBlockSelect={setSelectedBlock}
+          />
+          </div>
 
-            {/* File Input */}
-            <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center mb-6 transition-colors duration-200 hover:border-green-400">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-                id="file-upload"
-              />
-              <label htmlFor="file-upload" className="cursor-pointer block">
-                <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p className="text-lg text-gray-700 mb-2">
-                  {selectedFiles.length ? `${selectedFiles.length} file(s) selected` : "Click to browse or drag and drop"}
-                </p>
-                <p className="text-sm text-gray-500">Max file size: 10MB each</p>
-              </label>
-            </div>
-
-            {/* Previews */}
-            {previews.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Image Previews ({previews.length})</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {previews.map((url, idx) => (
-                    <div key={idx} className="relative">
-                      <img
-                        src={url}
-                        alt={`Preview ${idx}`}
-                        className="rounded-lg shadow-md w-full h-32 object-cover"
-                      />
-                      <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                        {selectedFiles[idx]?.name.split('.')[0]}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Enhanced Analyze Button with Loading Stages */}
-            <button
-              onClick={handleUpload}
-              disabled={!selectedFiles.length || isLoading}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 relative overflow-hidden ${!selectedFiles.length || isLoading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-                }`}
-            >
-              {isLoading ? (
-                <div className="flex flex-col items-center justify-center">
-                  {/* Loading Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 ease-out"
-                      style={{ width: `${loadingProgress}%` }}
-                    ></div>
-                  </div>
-                  
-                  {/* Stage Display */}
-                  <div className="flex items-center justify-center w-full">
-                    <span className="text-2xl mr-3 animate-pulse">
-                      {loadingStage && loadingStages[loadingStage]?.icon || "⏳"}
-                    </span>
-                    <div className="text-left">
-                      <div className="font-semibold">
-                        {loadingStage && loadingStages[loadingStage]?.message || "Starting analysis..."}
-                      </div>
-                      <div className="text-sm opacity-80 font-normal">
-                        {loadingStage && loadingStages[loadingStage]?.subtext || "Preparing your crop health report"}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Animated Dots */}
-                  <div className="flex mt-2 space-x-1">
-                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center">
-                  <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          {/* Upload Section */}
+          <div className="lg:w-1/2 max-w-4xl mx-auto mb-12">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 transition-all duration-300 hover:shadow-xl">
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  Analyze Crop Health
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">Upload Drone Images</h2>
+                <p className="text-gray-600">Supported formats: JPG, PNG, TIFF. You can upload multiple images.</p>
+              </div>
+
+              {/* File Input */}
+              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center mb-6 transition-colors duration-200 hover:border-green-400">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer block">
+                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-lg text-gray-700 mb-2">
+                    {selectedFiles.length ? `${selectedFiles.length} file(s) selected` : "Click to browse or drag and drop"}
+                  </p>
+                  <p className="text-sm text-gray-500">Max file size: 10MB each</p>
+                </label>
+              </div>
+
+              {/* Previews */}
+              {previews.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Image Previews ({previews.length})</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {previews.map((url, idx) => (
+                      <div key={idx} className="relative">
+                        <img
+                          src={url}
+                          alt={`Preview ${idx}`}
+                          className="rounded-lg shadow-md w-full h-32 object-cover"
+                        />
+                        <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                          {selectedFiles[idx]?.name.split('.')[0]}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-            </button>
 
-            {/* Loading Tips - Only shows during analysis */}
-            {isLoading && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl border border-emerald-200">
-                <div className="flex items-start">
-                  <div className="text-emerald-600 mr-3 mt-1">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+              {/* Enhanced Analyze Button with Loading Stages */}
+              <button
+                onClick={handleUpload}
+                disabled={!selectedFiles.length || isLoading}
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 relative overflow-hidden ${!selectedFiles.length || isLoading
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                  }`}
+              >
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center">
+                    {/* Loading Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 ease-out"
+                        style={{ width: `${loadingProgress}%` }}
+                      ></div>
+                    </div>
+
+                    {/* Stage Display */}
+                    <div className="flex items-center justify-center w-full">
+                      <span className="text-2xl mr-3 animate-pulse">
+                        {loadingStage && loadingStages[loadingStage]?.icon || "⏳"}
+                      </span>
+                      <div className="text-left">
+                        <div className="font-semibold">
+                          {loadingStage && loadingStages[loadingStage]?.message || "Starting analysis..."}
+                        </div>
+                        <div className="text-sm opacity-80 font-normal">
+                          {loadingStage && loadingStages[loadingStage]?.subtext || "Preparing your crop health report"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Animated Dots */}
+                    <div className="flex mt-2 space-x-1">
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 mb-1">Analysis in Progress</p>
-                    <p className="text-xs text-gray-600">
-                      Your drone images are being analyzed. This typically takes 30-60 seconds. 
-                      We're calculating vegetation indices, canopy coverage, stress levels, and yield predictions.
-                    </p>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Analyze Crop Health
+                  </div>
+                )}
+              </button>
+
+              {/* Loading Tips - Only shows during analysis */}
+              {isLoading && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl border border-emerald-200">
+                  <div className="flex items-start">
+                    <div className="text-emerald-600 mr-3 mt-1">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 mb-1">Analysis in Progress</p>
+                      <p className="text-xs text-gray-600">
+                        Your drone images are being analyzed. This typically takes 30-60 seconds.
+                        We're calculating vegetation indices, canopy coverage, stress levels, and yield predictions.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            
+              )}
+
+            </div>
           </div>
         </div>
+
+        {analysisResults?.vigor && (
+          <PlantVigorAnalysis
+            vigor={analysisResults.vigor}
+          />
+        )}
 
         {/* Results Section */}
         {metrics && !isLoading && (
@@ -472,8 +495,8 @@ function CropAnalysis() {
                 if (key === 'num_images_processed' || typeof value !== 'number') return null;
 
                 return (
-                  <div 
-                    key={key} 
+                  <div
+                    key={key}
                     className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-green-200 animate-fade-up"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
@@ -536,8 +559,8 @@ function CropAnalysis() {
 
                 <div className="space-y-6">
                   {analysisResults.recommendations.map((rec, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="animate-fade-up"
                       style={{ animationDelay: `${index * 150}ms` }}
                     >
@@ -550,7 +573,7 @@ function CropAnalysis() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

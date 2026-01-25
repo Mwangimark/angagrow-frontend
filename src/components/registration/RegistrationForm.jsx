@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { isAuthenticated } from "../../utils/auth";
+
 
 const RegistrationForm = ({ selectedRole }) => {
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [formData, setFormData] = useState({
-        first_name: '',  // Changed from firstName
-        last_name: '',   // Changed from lastName
+        first_name: '',
+        last_name: '',
         email: '',
         phone: '',
         password: '',
-        role: selectedRole,  // Added role to formData
+        role: selectedRole,
         confirm_password: '',
     });
     const [errors, setErrors] = useState({});
@@ -29,17 +32,21 @@ const RegistrationForm = ({ selectedRole }) => {
 
     const handleRegister = async (data) => {
         try {
+            console.log('Making registration API call...');
+
+            // 1. Register user
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/register/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
 
+            console.log('Response status:', response.status);
+
             if (!response.ok) {
                 const errorData = await response.json();
-                // Handle backend validation errors
+                console.log('Error response:', errorData);
+
                 if (errorData) {
                     const backendErrors = {};
                     Object.keys(errorData).forEach(key => {
@@ -54,10 +61,67 @@ const RegistrationForm = ({ selectedRole }) => {
 
             const result = await response.json();
             console.log('Registration success:', result);
-            setIsSubmitted(true);
+
+            // 2. Auto-login after successful registration
+            console.log('Attempting auto-login...');
+            const loginResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/login/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: data.email,
+                    password: data.password
+                }),
+            });
+
+            if (loginResponse.ok) {
+                const loginResult = await loginResponse.json();
+                console.log('Login success:', loginResult);
+
+                // CRITICAL: Tokens are nested in 'tokens' object
+                console.log('Tokens structure:', loginResult.tokens);
+
+                // Save the nested tokens
+                if (loginResult.tokens?.access) {
+                    localStorage.setItem('access_token', loginResult.tokens.access);
+                    console.log('✅ access_token saved');
+                } else {
+                    console.warn('❌ No access token found in loginResult.tokens');
+                }
+
+                if (loginResult.tokens?.refresh) {
+                    localStorage.setItem('refresh_token', loginResult.tokens.refresh);
+                    console.log('✅ refresh_token saved');
+                }
+
+                if (loginResult.user) {
+                    localStorage.setItem('user', JSON.stringify(loginResult.user));
+                    console.log('✅ user data saved');
+                }
+
+                // Verify storage
+                console.log('Verification:', {
+                    access_token_stored: !!localStorage.getItem('access_token'),
+                    access_token_length: localStorage.getItem('access_token')?.length,
+                    isAuthenticated: isAuthenticated()
+                });
+
+                navigate('/addfarm', { replace: true });
+            } else {
+                console.warn('Auto-login failed');
+                const errorData = await loginResponse.json();
+                console.log('Login error:', errorData);
+
+                navigate('/login', {
+                    replace: true,
+                    state: {
+                        message: 'Registration successful! Please login manually.',
+                        email: data.email
+                    }
+                });
+            }
 
         } catch (error) {
-            console.error('Error registering:', error);
+            console.error('Error:', error);
             setErrors({ general: 'Registration failed. Please try again.' });
         }
     };
@@ -283,7 +347,7 @@ const RegistrationForm = ({ selectedRole }) => {
                     </label>
                     <input
                         name="password"
-                        type={showPassword?"text":"password"}
+                        type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={handleChange}
                         className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-emerald-500'
@@ -330,7 +394,7 @@ const RegistrationForm = ({ selectedRole }) => {
                     </label>
                     <input
                         name="confirm_password"
-                        type={showConfirmPassword?"text":"password"}
+                        type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirm_password}
                         onChange={handleChange}
                         className={`w-full border rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${errors.confirm_password
