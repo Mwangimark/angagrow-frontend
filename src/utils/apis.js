@@ -40,7 +40,7 @@ export const fetchWithAuth = async (url, options = {}) => {
 };
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api", // adjust if needed
+  baseURL: process.env.REACT_APP_API_BASE_URL || '/api', // adjust if needed
 });
 
 api.interceptors.request.use((config) => {
