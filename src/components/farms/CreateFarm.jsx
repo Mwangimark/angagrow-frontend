@@ -37,7 +37,7 @@ const CreateFarm = ({ onFarmCreated, onFarmCreatedWithId, showTitle = true, isFi
       };
 
       // Create the farm
-      const response = await api.post("/farms/", payload);
+      const response = await api.post("/farming/farms/", payload);
       const createdFarm = response.data;
 
       // Reset form

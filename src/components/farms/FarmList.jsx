@@ -9,7 +9,7 @@ const FarmList = ({ farms, onAddBlock, refreshFarms }) => {
 
   const fetchBlocks = async (farmId) => {
     try {
-      const res = await api.get(`/farms/${farmId}/blocks/`);
+      const res = await api.get(`/farming/farms/${farmId}/blocks/`);
       setBlocks(prev => ({
         ...prev,
         [farmId]: res.data

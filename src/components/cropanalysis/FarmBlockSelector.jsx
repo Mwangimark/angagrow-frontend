@@ -49,7 +49,7 @@ const FarmBlockSelector = ({
   const fetchFarms = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/farms/");
+      const response = await api.get("/farming/farms");
       setFarms(response.data);
       
       // Auto-select if only 1 farm exists
@@ -66,7 +66,7 @@ const FarmBlockSelector = ({
   
   const fetchBlocks = async (farmId) => {
     try {
-      const response = await api.get(`/farms/${farmId}/blocks/`);
+      const response = await api.get(`/farming/farms/${farmId}/blocks/`);
       setBlocks(response.data);
       
       // Auto-select if only 1 block exists

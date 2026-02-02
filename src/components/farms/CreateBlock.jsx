@@ -19,7 +19,7 @@ const CreateBlock = ({ farmId, onBlockCreated }) => {
 
   const fetchCropTypes = async () => {
     try {
-      const res = await api.get("/crop-types/");
+      const res = await api.get("/farming/crop-types/");
       console.log("Crop types fetched:", res.data);
       
       if (res.data.length > 0) {
@@ -65,7 +65,7 @@ const CreateBlock = ({ farmId, onBlockCreated }) => {
       console.log("Sending payload:", payload);
 
       // Make API call
-      const response = await api.post(`/farms/${farmId}/blocks/`, payload);
+      const response = await api.post(`farming/farms/${farmId}/blocks/`, payload);
       console.log("Success:", response.data);
 
       // Reset form

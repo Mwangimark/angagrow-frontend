@@ -25,7 +25,7 @@ const Dashboardfarmer = () => {
 
   const checkUserFarms = async () => {
     try {
-      const response = await api.get("/farms/")
+      const response = await api.get("/farming/farms")
       setFarms(response.data)
 
       // If user has no farms, show create farm flow

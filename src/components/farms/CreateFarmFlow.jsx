@@ -13,7 +13,7 @@ const CreateFarmFlow = ({ onComplete }) => {
   // Handle farm creation success
   const handleFarmCreated = async (farmData) => {
     try {
-      const response = await api.post("/farms/", farmData);
+      const response = await api.post("/farming/farms", farmData);
       const createdFarm = response.data;
       setFarmId(createdFarm.id);
       setFarmName(createdFarm.name);
