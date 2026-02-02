@@ -46,8 +46,8 @@ const StatsImpact = () => {
   const statsData = [
     {
       icon: <FaSeedling className="text-3xl" />,
-      value: "3+",
-      numericValue: 3,
+      value: "10+",
+      numericValue: 10,
       label: "Active Farms",
       change: "+25% this year",
       color: "from-emerald-500 to-green-500",

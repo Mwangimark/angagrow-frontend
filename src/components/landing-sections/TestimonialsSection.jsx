@@ -14,7 +14,7 @@ const TestimonialsSection = () => {
       name: "John Kamau",
       role: "Maize Farmer, Nakuru",
       image: image4,
-      quote: "AngaGrow helped me increase my maize yield by 65% in just one season. The smart irrigation system alone saved me KES 120,000 in water costs.",
+      quote: "AngaGrow helped me increase my maize yield by 18% in just one season. The smart irrigation system alone saved me KES 20,000 in water costs.",
       rating: 5,
       farmSize: "50 Acres",
       improvement: "+15% Yield"
@@ -23,16 +23,16 @@ const TestimonialsSection = () => {
       name: "Sarah Wanjiku",
       role: "Coffee Farmer, Kiambu",
       image: image5, // African woman face
-      quote: "The market insights feature connected me directly with exporters. I now get 40% better prices for my coffee beans.",
+      quote: "The market insights feature connected me directly with exporters. I now get 15% better prices for my coffee beans.",
       rating: 5,
       farmSize: "25 Acres",
-      improvement: "+17% Profit"
+      improvement: "+11% Profit"
     },
     {
       name: "David Omondi",
       role: "Dairy & Crops Farmer, Meru",
       image: image3, // African man smiling
-      quote: "The integrated system helped me optimize both my dairy and crop operations. My overall income increased by KES 800,000 annually.",
+      quote: "The integrated system helped me optimize both my dairy and crop operations. My overall income increased by KES 80,000 annually.",
       rating: 5,
       farmSize: "80 Acres",
       improvement: "+12% Income"
@@ -50,10 +50,10 @@ const TestimonialsSection = () => {
       name: "James Kariuki",
       role: "Tea Farmer, Kericho",
       image: image2, 
-      quote: "With AngaGrow's weather predictions, I've reduced crop losses by 80% during rainy seasons. Revolutionary technology!",
+      quote: "With AngaGrow's weather predictions, I've reduced crop losses by 15% during rainy seasons. Revolutionary technology!",
       rating: 5,
       farmSize: "30 Acres",
-      improvement: "+15% Quality"
+      improvement: "+13% Quality"
     },
     {
       name: "Mary Atieno",
