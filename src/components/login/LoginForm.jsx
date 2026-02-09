@@ -96,8 +96,7 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
             onSubmit(data);
           }
 
-          // ✅ Use window.location.href for immediate redirect
-          // ✅ Redirect based on SELECTED role at login time
+
           setTimeout(() => {
             console.log('🔀 Redirecting to unified dashboard for role:', selectedRole);
             window.location.href = '/dashboard'; // ✅ Always /dashboard
