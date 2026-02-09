@@ -58,7 +58,8 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
           },
           body: JSON.stringify({
             email: formData.email,
-            password: formData.password
+            password: formData.password,
+            role: selectedRole,
           }),
         });
 
@@ -106,8 +107,17 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
         }
 
       } catch (error) {
+        const data = error.response?.data;
+
+        if (data?.error_code === "ROLE_MISMATCH") {
+          setErrors(data.message);
+        } else {
+          setErrors(
+            data?.message || 'An error occurred during login. Please try again.'
+          );
+        }
         console.error('Login error:', error);
-        setErrors({ general: 'Network error. Please check your connection.' });
+        setErrors({ general: 'An error occurred during login. Please try again.' });
       } finally {
         setIsLoading(false);
       }

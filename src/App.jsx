@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import CropAnalysis from "./pages/CropAnalysis";
 import Layout from "./components/Layout";
@@ -11,61 +11,30 @@ import LandingPage from "./pages/LandingPage";
 import CreateFarm from "./components/farms/CreateFarm";
 
 function App() {
-  // Helper function to check auth
-  const checkAuth = () => {
-    return isAuthenticated();
-  };
+  const checkAuth = () => isAuthenticated();
 
   return (
-    <Router>
+    <Router basename={process.env.REACT_APP_BASENAME || "/"}>
       <Routes>
-        {/* Default route - redirect based on auth status */}
-        <Route 
-          path="/" 
-          element={
-            <LandingPage/>
-          } 
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/login"
+          element={checkAuth() ? <Navigate to="/register" replace /> : <Login />}
         />
-        {/* Public routes - only accessible when NOT logged in */}
-        <Route 
-          path="/login" 
-          element={
-            checkAuth() ? 
-              <Navigate to="/register" replace /> : 
-              <Login />
-          } 
+        <Route
+          path="/register"
+          element={checkAuth() ? <Navigate to="/dashboard" replace /> : <Register />}
         />
-        <Route 
-          path="/register" 
-          element={
-            checkAuth() ? 
-              <Navigate to="/dashboard" replace /> : 
-              <Register />
-          } 
-        />
-        
-        {/* Protected routes */}
-        <Route 
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
+
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crop-analysis" element={<CropAnalysis />} />
           <Route path="/profile" element={<Profile />} />
-          {/* Add other protected routes here */}
         </Route>
 
-        {/* Catch-all route - redirect based on auth */}
-        <Route 
-          path="*" 
-          element={
-            checkAuth() ? 
-              <Navigate to="/dashboard" replace /> : 
-              <Navigate to="/login" replace />
-          } 
+        <Route
+          path="*"
+          element={checkAuth() ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
         />
       </Routes>
     </Router>

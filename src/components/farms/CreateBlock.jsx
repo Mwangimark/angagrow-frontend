@@ -65,7 +65,7 @@ const CreateBlock = ({ farmId, onBlockCreated }) => {
       console.log("Sending payload:", payload);
 
       // Make API call
-      const response = await api.post(`farming/farms/${farmId}/blocks/`, payload);
+      const response = await api.post(`/farming/farms/${farmId}/blocks/`, payload);
       console.log("Success:", response.data);
 
       // Reset form

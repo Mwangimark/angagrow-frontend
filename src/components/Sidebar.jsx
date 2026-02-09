@@ -184,7 +184,7 @@ function Sidebar() {
             </div>
             <button
               className={`w-full mt-3 bg-white/20 hover:bg-white/30 text-white text-sm py-2 rounded-lg transition-colors duration-200`}
-              onClick={() => window.location.href = '/login?switch=true'}
+              onClick={() => window.location.href = 'portal/login?switch=true'}
             >
               Switch Dashboard
             </button>

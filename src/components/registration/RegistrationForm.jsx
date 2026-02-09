@@ -41,11 +41,34 @@ const RegistrationForm = ({ selectedRole }) => {
                 body: JSON.stringify(data),
             });
 
+            console.log('User registered with role:', response);
             console.log('Response status:', response.status);
 
+            // Check content type before parsing JSON
+            const contentType = response.headers.get('content-type');
+
             if (!response.ok) {
-                const errorData = await response.json();
-                console.log('Error response:', errorData);
+                let errorData = {};
+
+                // Only parse as JSON if it's actually JSON
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        errorData = await response.json();
+                    } catch (jsonError) {
+                        console.warn('Failed to parse error response as JSON:', jsonError);
+                        const text = await response.text();
+                        console.log('Raw error response:', text.substring(0, 500));
+                    }
+                } else {
+                    // Handle HTML/other responses
+                    const text = await response.text();
+                    console.log('Non-JSON error response:', text.substring(0, 500));
+
+                    // Create a user-friendly error message
+                    errorData = {
+                        non_field_errors: ['Server error. Please try again later.']
+                    };
+                }
 
                 if (errorData) {
                     const backendErrors = {};
@@ -59,8 +82,19 @@ const RegistrationForm = ({ selectedRole }) => {
                 return;
             }
 
-            const result = await response.json();
-            console.log('Registration success:', result);
+            // Handle successful response
+            let result;
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+                console.log('Registration success:', result);
+            } else {
+                // This shouldn't happen on success, but handle it
+                const text = await response.text();
+                console.warn('Success response is not JSON:', text.substring(0, 200));
+                // You might want to treat this as success or error based on your needs
+                setErrors({ general: 'Unexpected response format' });
+                return;
+            }
 
             // 2. Auto-login after successful registration
             console.log('Attempting auto-login...');
@@ -73,9 +107,21 @@ const RegistrationForm = ({ selectedRole }) => {
                 }),
             });
 
+            // Check content type for login response too
+            const loginContentType = loginResponse.headers.get('content-type');
+
             if (loginResponse.ok) {
-                const loginResult = await loginResponse.json();
-                console.log('Login success:', loginResult);
+                let loginResult;
+
+                if (loginContentType && loginContentType.includes('application/json')) {
+                    loginResult = await loginResponse.json();
+                    console.log('Login success:', loginResult);
+                } else {
+                    const text = await loginResponse.text();
+                    console.warn('Login success response is not JSON:', text.substring(0, 200));
+                    setErrors({ general: 'Login succeeded but with unexpected response' });
+                    return;
+                }
 
                 // CRITICAL: Tokens are nested in 'tokens' object
                 console.log('Tokens structure:', loginResult.tokens);
@@ -108,8 +154,15 @@ const RegistrationForm = ({ selectedRole }) => {
                 navigate('/addfarm', { replace: true });
             } else {
                 console.warn('Auto-login failed');
-                const errorData = await loginResponse.json();
-                console.log('Login error:', errorData);
+
+                let errorData = {};
+                if (loginContentType && loginContentType.includes('application/json')) {
+                    errorData = await loginResponse.json();
+                    console.log('Login error:', errorData);
+                } else {
+                    const text = await loginResponse.text();
+                    console.log('Non-JSON login error:', text.substring(0, 500));
+                }
 
                 navigate('/login', {
                     replace: true,
@@ -121,7 +174,7 @@ const RegistrationForm = ({ selectedRole }) => {
             }
 
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Network or unexpected error:', error);
             setErrors({ general: 'Registration failed. Please try again.' });
         }
     };

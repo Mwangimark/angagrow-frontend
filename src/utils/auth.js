@@ -1,5 +1,7 @@
 // utils/auth.js
 
+import { Navigate } from "react-router-dom";
+
 // Get access token from localStorage
 export const getAccessToken = () => {
     try {
@@ -58,6 +60,7 @@ export const logout = async () => {
                     },
                     body: JSON.stringify({ refresh: refreshToken }),
                 });
+                Navigate('/login');
             } catch (apiError) {
                 console.warn('⚠️ Logout API call failed, but continuing with local logout:', apiError);
                 // Continue with local logout even if API fails
