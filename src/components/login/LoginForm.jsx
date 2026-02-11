@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = ({ selectedRole, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,7 +102,7 @@ const LoginForm = ({ selectedRole, onSubmit }) => {
 
           setTimeout(() => {
             console.log('🔀 Redirecting to unified dashboard for role:', selectedRole);
-            window.location.href = '/dashboard'; // ✅ Always /dashboard
+            navigate("/dashboard"); // ✅ Always /dashboard
           }, 100);
         } else {
           setErrors({ general: 'Invalid response from server' });

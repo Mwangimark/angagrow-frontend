@@ -29,9 +29,6 @@ function Sidebar() {
     { path: "/market-analysis", label: "Recommender", icon: "🤖" },
     { path: "/transactions", label: "Financing Requests", icon: "💰" },
     { path: "/reports", label: "Performance", icon: "📈" },
-    { path: "/documents", label: "Community", icon: "👥" },
-    { path: "/portfolio", label: "Reports", icon: "📋" },
-    { path: "/contracts", label: "User Settings", icon: "⚙️" },
   ];
 
   // Two color schemes

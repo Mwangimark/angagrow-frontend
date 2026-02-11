@@ -1,6 +1,8 @@
 // utils/auth.js
 
-import { Navigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
+
+const navigate =  useNavigate
 
 // Get access token from localStorage
 export const getAccessToken = () => {
@@ -60,7 +62,7 @@ export const logout = async () => {
                     },
                     body: JSON.stringify({ refresh: refreshToken }),
                 });
-                Navigate('/login');
+                navigate('/login');
             } catch (apiError) {
                 console.warn('⚠️ Logout API call failed, but continuing with local logout:', apiError);
                 // Continue with local logout even if API fails
@@ -76,7 +78,7 @@ export const logout = async () => {
         
         // Redirect to login page
         console.log('🔀 Redirecting to login...');
-        window.location.href = '/login';
+        navigate('/login');
     }
 };
 
