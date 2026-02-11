@@ -95,8 +95,7 @@ export const refreshAccessToken = async () => {
     try {
         const refreshToken = getRefreshToken();
         if (!refreshToken) {
-            // You need to pass navigate or handle redirection differently
-            await logout(); // This will use the fallback redirect
+            await logout(); 
             return null;
         }
 
