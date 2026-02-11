@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation,useNavigate } from "react-router-dom";
 import { logout, getUser } from "../utils/auth";
 
 function Sidebar() {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate();
 
   const user = getUser();
   const selectedRole = user?.login_selected_role || user?.role || 'farmer';
@@ -82,7 +83,7 @@ function Sidebar() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await logout();
+      await logout(navigate);
     } catch (error) {
       console.error("Logout error:", error);
       setIsLoggingOut(false);
