@@ -1,8 +1,7 @@
 // utils/auth.js
 
-import {useNavigate } from "react-router-dom";
-
-const navigate =  useNavigate
+// Don't import useNavigate here - it should be used in components only
+// import { useNavigate } from "react-router-dom";
 
 // Get access token from localStorage
 export const getAccessToken = () => {
@@ -44,7 +43,8 @@ export const isAuthenticated = () => {
 };
 
 // Logout function - calls API and clears local storage
-export const logout = async () => {
+// Updated to accept navigate as a parameter
+export const logout = async (navigate = null) => {
     try {
         const refreshToken = getRefreshToken();
         const accessToken = getAccessToken();
@@ -62,10 +62,13 @@ export const logout = async () => {
                     },
                     body: JSON.stringify({ refresh: refreshToken }),
                 });
-                navigate('/login');
+                
+                // You could handle the response if needed
+                if (response.ok) {
+                    console.log('✅ Successfully logged out from server');
+                }
             } catch (apiError) {
                 console.warn('⚠️ Logout API call failed, but continuing with local logout:', apiError);
-                // Continue with local logout even if API fails
             }
         }
     } catch (error) {
@@ -76,9 +79,14 @@ export const logout = async () => {
         localStorage.removeItem('user');
         localStorage.removeItem('remember_me');
         
-        // Redirect to login page
+        // Redirect to login page if navigate function is provided
         console.log('🔀 Redirecting to login...');
-        navigate('/login');
+        if (navigate && typeof navigate === 'function') {
+            navigate('/login');
+        } else {
+            // Fallback: redirect by changing window location
+            window.location.href = '/login';
+        }
     }
 };
 
@@ -87,7 +95,8 @@ export const refreshAccessToken = async () => {
     try {
         const refreshToken = getRefreshToken();
         if (!refreshToken) {
-            logout();
+            // You need to pass navigate or handle redirection differently
+            await logout(); // This will use the fallback redirect
             return null;
         }
 
@@ -100,7 +109,7 @@ export const refreshAccessToken = async () => {
         });
 
         if (!response.ok) {
-            logout();
+            await logout(); // This will use the fallback redirect
             return null;
         }
 
@@ -113,12 +122,11 @@ export const refreshAccessToken = async () => {
             return data.tokens.access;
         }
         
-        logout();
+        await logout(); // This will use the fallback redirect
         return null;
     } catch (error) {
         console.error('Token refresh error:', error);
-        logout();
+        await logout(); // This will use the fallback redirect
         return null;
     }
 };
-
