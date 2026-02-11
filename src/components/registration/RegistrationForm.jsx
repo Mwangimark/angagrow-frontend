@@ -82,11 +82,11 @@ const RegistrationForm = ({ selectedRole }) => {
                 return;
             }
 
-            // Handle successful response
             let result;
             if (contentType && contentType.includes('application/json')) {
                 result = await response.json();
                 console.log('Registration success:', result);
+                navigate('/login');
             } else {
                 // This shouldn't happen on success, but handle it
                 const text = await response.text();
@@ -95,84 +95,7 @@ const RegistrationForm = ({ selectedRole }) => {
                 setErrors({ general: 'Unexpected response format' });
                 return;
             }
-
-            // 2. Auto-login after successful registration
-            console.log('Attempting auto-login...');
-            const loginResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/accounts/login/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: data.email,
-                    password: data.password
-                }),
-            });
-
-            // Check content type for login response too
-            const loginContentType = loginResponse.headers.get('content-type');
-
-            if (loginResponse.ok) {
-                let loginResult;
-
-                if (loginContentType && loginContentType.includes('application/json')) {
-                    loginResult = await loginResponse.json();
-                    console.log('Login success:', loginResult);
-                } else {
-                    const text = await loginResponse.text();
-                    console.warn('Login success response is not JSON:', text.substring(0, 200));
-                    setErrors({ general: 'Login succeeded but with unexpected response' });
-                    return;
-                }
-
-                // CRITICAL: Tokens are nested in 'tokens' object
-                console.log('Tokens structure:', loginResult.tokens);
-
-                // Save the nested tokens
-                if (loginResult.tokens?.access) {
-                    localStorage.setItem('access_token', loginResult.tokens.access);
-                    console.log('✅ access_token saved');
-                } else {
-                    console.warn('❌ No access token found in loginResult.tokens');
-                }
-
-                if (loginResult.tokens?.refresh) {
-                    localStorage.setItem('refresh_token', loginResult.tokens.refresh);
-                    console.log('✅ refresh_token saved');
-                }
-
-                if (loginResult.user) {
-                    localStorage.setItem('user', JSON.stringify(loginResult.user));
-                    console.log('✅ user data saved');
-                }
-
-                // Verify storage
-                console.log('Verification:', {
-                    access_token_stored: !!localStorage.getItem('access_token'),
-                    access_token_length: localStorage.getItem('access_token')?.length,
-                    isAuthenticated: isAuthenticated()
-                });
-
-                navigate('/addfarm', { replace: true });
-            } else {
-                console.warn('Auto-login failed');
-
-                let errorData = {};
-                if (loginContentType && loginContentType.includes('application/json')) {
-                    errorData = await loginResponse.json();
-                    console.log('Login error:', errorData);
-                } else {
-                    const text = await loginResponse.text();
-                    console.log('Non-JSON login error:', text.substring(0, 500));
-                }
-
-                navigate('/login', {
-                    replace: true,
-                    state: {
-                        message: 'Registration successful! Please login manually.',
-                        email: data.email
-                    }
-                });
-            }
-
+            
         } catch (error) {
             console.error('Network or unexpected error:', error);
             setErrors({ general: 'Registration failed. Please try again.' });
