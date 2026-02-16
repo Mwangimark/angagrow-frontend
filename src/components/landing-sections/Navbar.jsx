@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
-import { FaLeaf } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import logo from '../../assets/angagrow_logo.png';
+// import { FaLeaf } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+// import logo from '../../assets/angagrow_logo.png';
 import imglogo from '../../assets/logo.png';
 
 const Navbar = () => {
@@ -23,9 +23,9 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-gray-700 hover:text-emerald-600 font-medium">
+            <a href="/" className="text-gray-700 hover:text-emerald-600 font-medium">
               Home
-            </Link>
+            </a>
             <a href="#features" className="text-gray-700 hover:text-emerald-600 font-medium">
               Features
             </a>
@@ -42,19 +42,21 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link
-              to="/login"
+            <a
+              href={`${process.env.REACT_APP_PORTAL_URL || ""}/portal/login`}
               className="text-gray-700 hover:text-emerald-600 font-medium py-2 px-4"
             >
               Log In
-            </Link>
-            <Link
-              to="/signup"
+            </a>
+
+            <a
+              href={`${process.env.REACT_APP_PORTAL_URL || ""}/portal/signup`}
               className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
             >
               Start Free Trial
-            </Link>
+            </a>
           </div>
+
 
           {/* Mobile Menu Button */}
           <button
@@ -69,13 +71,14 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col gap-4">
-              <Link
-                to="/"
+              <a
+                href="/"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-emerald-600 font-medium py-2"
               >
                 Home
-              </Link>
+              </a>
+
               <a
                 href="#features"
                 onClick={() => setIsOpen(false)}
@@ -104,22 +107,22 @@ const Navbar = () => {
               >
                 About
               </a>
-              <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="text-gray-700 hover:text-emerald-600 font-medium py-3 text-center"
+              <div className="hidden md:flex items-center gap-4">
+                <a
+                  href={`${process.env.REACT_APP_PORTAL_URL || ""}/portal/login`}
+                  className="text-gray-700 hover:text-emerald-600 font-medium py-2 px-4"
                 >
                   Log In
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 rounded-xl text-center"
+                </a>
+
+                <a
+                  href={`${process.env.REACT_APP_PORTAL_URL || ""}/portal/signup`}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
                 >
                   Start Free Trial
-                </Link>
+                </a>
               </div>
+
             </div>
           </div>
         )}

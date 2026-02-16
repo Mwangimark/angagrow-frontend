@@ -7,7 +7,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { isAuthenticated } from "./utils/auth";
 import Profile from "./pages/Profile";
-import LandingPage from "./pages/LandingPage";
+// import LandingPage from "./pages/LandingPage";
 import CreateFarm from "./components/farms/CreateFarm";
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
   return (
     <Router basename={process.env.REACT_APP_BASENAME || "/"}>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        {/* <Route path="/" element={<LandingPage />} /> */}
         <Route
           path="/login"
           element={checkAuth() ? <Navigate to="/register" replace /> : <Login />}
