@@ -39,7 +39,9 @@ export const getUser = () => {
 
 // Check if user is authenticated
 export const isAuthenticated = () => {
-    return !!getAccessToken();
+  const token = getAccessToken();
+  if (!token) return false;
+  return !isTokenExpired(); // Check expiry too!
 };
 
 // Logout function - calls API and clears local storage
@@ -128,4 +130,25 @@ export const refreshAccessToken = async () => {
         await logout(); // This will use the fallback redirect
         return null;
     }
+};
+
+export const isTokenExpired = () => {
+  const token = getAccessToken();
+  if (!token) return true;
+  
+  try {
+    // Decode JWT payload
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(window.atob(base64));
+    const expiry = payload.exp * 1000; // Convert to milliseconds
+    
+    console.log(`Token expiry: ${new Date(expiry).toLocaleString()}`);
+    console.log(`Current time: ${new Date().toLocaleString()}`);
+    
+    return Date.now() >= expiry;
+  } catch (error) {
+    console.error('Error checking token expiry:', error);
+    return true;
+  }
 };

@@ -23,6 +23,8 @@ const Dashboardfarmer = () => {
     checkUserFarms()
   }, [])
 
+  // Dashboardfarmer.jsx - Update the checkUserFarms function
+
   const checkUserFarms = async () => {
     try {
       const response = await api.get("/farming/farms")
@@ -34,6 +36,16 @@ const Dashboardfarmer = () => {
       }
     } catch (error) {
       console.error('Error fetching farms:', error)
+
+      // ✅ Check if error is 401 (already handled by interceptor, but just in case)
+      if (error.response?.status === 401) {
+        console.log('Authentication failed, redirecting...');
+        // The interceptor will handle redirect, but we can also handle here
+        // window.location.href = '/login';
+      } else {
+        // Other errors - show user-friendly message
+        console.error('Failed to load farms:', error.message);
+      }
     } finally {
       setLoading(false)
     }
@@ -63,8 +75,8 @@ const Dashboardfarmer = () => {
   // Handle block creation completion
   const handleBlockCreated = () => {
     setTimeout(async () => {
-    await checkUserFarms();  // This updates farms state
-  }, 500);
+      await checkUserFarms();  // This updates farms state
+    }, 500);
   }
 
   // Skip block creation
