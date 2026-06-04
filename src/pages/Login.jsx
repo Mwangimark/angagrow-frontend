@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import LoginRoleSelector from "../components/login/LoginRoleSelector";
 import LoginForm from "../components/login/LoginForm";
-import { isAuthenticated, getUser } from "../utils/auth";
+import { isAuthenticated, isTokenExpired, getAccessToken } from "../utils/auth"; // ✅ Add imports
 import Navbar from "../components/landing-sections/Navbar";
 import Footer from "../components/landing-sections/Footer";
 import { FiArrowLeft, FiHome } from "react-icons/fi";
@@ -11,10 +11,18 @@ const Login = () => {
   const [selectedRole, setSelectedRole] = useState("farmer");
   const navigate = useNavigate();
 
-  // Redirect if already logged in - BASED ON USER ROLE
+  // ✅ FIXED - Check if token is valid, not just exists
   useEffect(() => {
-    if (isAuthenticated()) {
-      navigate("/dashboard"); // ✅ Always /dashboard
+    const token = getAccessToken();
+    
+    if (token && !isTokenExpired()) {
+      // Only redirect if token exists AND is NOT expired
+      console.log("Valid token found, redirecting to dashboard");
+      navigate("/dashboard");
+    } else if (token && isTokenExpired()) {
+      // Token exists but expired - clear it
+      console.log("Token expired, clearing and staying on login page");
+      localStorage.clear();
     }
   }, [navigate]);
 
@@ -28,6 +36,7 @@ const Login = () => {
   };
 
   return (
+    // ... rest of your JSX remains exactly the same
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 flex items-center justify-center p-4">
