@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom' // ✅ ADD THIS
 import FarmerSummary from '../../components/dashboard/Farmerdb/FarmerSummary'
 import DashboardHeader from '../../components/dashboard/DashboardHeader'
 import CreateFarm from '../../components/farms/CreateFarm'
 import CreateBlock from '../../components/farms/CreateBlock'
 import FarmList from '../../components/farms/FarmList'
 import api from '../../utils/apis'
+import { getAccessToken, isTokenExpired } from '../../utils/auth' // ✅ ADD THIS
 
 const Dashboardfarmer = () => {
+  const navigate = useNavigate() // ✅ ADD THIS
   const [showCreateFarm, setShowCreateFarm] = useState(false)
   const [showCreateBlock, setShowCreateBlock] = useState(false)
   const [farms, setFarms] = useState([])
@@ -18,32 +21,54 @@ const Dashboardfarmer = () => {
   const refreshFarmsData = async () => {
     await checkUserFarms();
   };
-  // Check user's farms on component mount
+
+  // ✅ UPDATE THIS useEffect - Check token FIRST
   useEffect(() => {
-    checkUserFarms()
-  }, [])
+    const validateAndFetch = async () => {
+      const token = getAccessToken();
+      
+      console.log('🔍 Checking token...');
+      console.log('Token exists:', !!token);
+      
+      if (!token) {
+        console.log('❌ No token found, redirecting to login');
+        navigate('/login');
+        return;
+      }
+      
+      if (isTokenExpired()) {
+        console.log('❌ Token expired, clearing and redirecting to login');
+        localStorage.clear();
+        navigate('/login');
+        return;
+      }
+      
+      console.log('✅ Token valid, fetching farms...');
+      await checkUserFarms();
+    };
+    
+    validateAndFetch();
+  }, []); // ✅ Empty dependency array - runs once on mount
 
-  // Dashboardfarmer.jsx - Update the checkUserFarms function
-
+  // ✅ UPDATE checkUserFarms with better error handling
   const checkUserFarms = async () => {
     try {
+      console.log('📡 Fetching farms from /farming/farms');
       const response = await api.get("/farming/farms")
+      console.log('✅ Farms fetched:', response.data);
       setFarms(response.data)
 
-      // If user has no farms, show create farm flow
       if (response.data.length === 0) {
         startFarmCreationFlow()
       }
     } catch (error) {
       console.error('Error fetching farms:', error)
 
-      // ✅ Check if error is 401 (already handled by interceptor, but just in case)
       if (error.response?.status === 401) {
-        console.log('Authentication failed, redirecting...');
-        // The interceptor will handle redirect, but we can also handle here
-        // window.location.href = '/login';
+        console.log('🔐 401 Unauthorized - Token invalid, redirecting to login');
+        localStorage.clear();
+        navigate('/login');
       } else {
-        // Other errors - show user-friendly message
         console.error('Failed to load farms:', error.message);
       }
     } finally {
@@ -51,7 +76,7 @@ const Dashboardfarmer = () => {
     }
   }
 
-  // Start the complete farm + block creation flow
+  // Rest of your functions remain exactly the same...
   const startFarmCreationFlow = () => {
     setShowCreateFarm(true)
     setShowCreateBlock(false)
@@ -60,33 +85,26 @@ const Dashboardfarmer = () => {
     setCurrentFarmTotalArea(0)
   }
 
-  // Handle farm creation - ALWAYS go to block creation
   const handleFarmCreated = (farmId, farmName, farmTotalArea) => {
-    // Store farm data for block creation
     setCurrentFarmId(farmId)
     setCurrentFarmName(farmName)
     setCurrentFarmTotalArea(farmTotalArea)
-
-    // Hide farm form, show block form
     setShowCreateFarm(false)
     setShowCreateBlock(true)
   }
 
-  // Handle block creation completion
   const handleBlockCreated = () => {
     setTimeout(async () => {
-      await checkUserFarms();  // This updates farms state
+      await checkUserFarms();
     }, 500);
   }
 
-  // Skip block creation
   const handleSkipBlocks = () => {
     setShowCreateBlock(false)
     checkUserFarms()
     console.log(`Farm ${currentFarmName} created without blocks`)
   }
 
-  // Add another block to existing farm
   const handleAddBlockToFarm = (farmId, farmName, farmTotalArea) => {
     setCurrentFarmId(farmId)
     setCurrentFarmName(farmName)
@@ -109,19 +127,16 @@ const Dashboardfarmer = () => {
     <>
       <DashboardHeader />
 
-      {/* Main Dashboard Content */}
       <div className={`transition-all duration-300 ${showCreateFarm || showCreateBlock ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'
         }`}>
         <FarmerSummary />
 
-        {/* Show Farm List if user has farms */}
         {farms.length > 0 && (
           <div className="container mx-auto px-4 mt-8">
             <FarmList farms={farms} onAddBlock={handleAddBlockToFarm} refreshFarms={refreshFarmsData} />
           </div>
         )}
 
-        {/* Add Farm Button (always shown if not in creation flow) */}
         {!showCreateFarm && !showCreateBlock && (
           <div className="container mx-auto px-4 mt-8">
             <button
@@ -137,13 +152,9 @@ const Dashboardfarmer = () => {
         )}
       </div>
 
-      {/* Create Farm Overlay */}
       {showCreateFarm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
-          {/* Create Farm Component */}
           <div className="relative z-10 w-full max-w-2xl">
             <div className="bg-white rounded-3xl shadow-2xl p-8">
               <div className="flex justify-between items-start mb-6">
@@ -155,8 +166,6 @@ const Dashboardfarmer = () => {
                     You'll be able to add blocks for different crops after creating the farm
                   </p>
                 </div>
-
-                {/* Close button (only if user already has farms) */}
                 {farms.length > 0 && (
                   <button
                     onClick={() => setShowCreateFarm(false)}
@@ -166,7 +175,6 @@ const Dashboardfarmer = () => {
                   </button>
                 )}
               </div>
-
               <CreateFarm
                 onFarmCreatedWithId={handleFarmCreated}
                 isFirstFarm={farms.length === 0}
@@ -177,13 +185,9 @@ const Dashboardfarmer = () => {
         </div>
       )}
 
-      {/* Create Block Overlay */}
       {showCreateBlock && currentFarmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
-          {/* Create Block Component */}
           <div className="relative z-10 w-full max-w-2xl">
             <div className="bg-white rounded-3xl shadow-2xl p-8">
               <div className="flex justify-between items-start mb-6">
@@ -198,8 +202,6 @@ const Dashboardfarmer = () => {
                     }
                   </p>
                 </div>
-
-                {/* Close button */}
                 <button
                   onClick={handleSkipBlocks}
                   className="text-gray-400 hover:text-gray-600 text-2xl"
@@ -207,14 +209,11 @@ const Dashboardfarmer = () => {
                   ×
                 </button>
               </div>
-
               <CreateBlock
                 farmId={currentFarmId}
                 farmTotalArea={currentFarmTotalArea}
                 onBlockCreated={handleBlockCreated}
               />
-
-              {/* Add another block button */}
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <button
                   onClick={handleSkipBlocks}
