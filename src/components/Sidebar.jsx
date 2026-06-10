@@ -21,7 +21,8 @@ function Sidebar() {
     { path: "/profile", label: "Profile", icon: "👤" },
     { path: "/crop-analysis", label: "Crop Analysis", icon: "🌱" },
     { path: "/field-mapping", label: "Yield Estimates", icon: "🗺️" },
-    { path: "/dronesprays", label: "Grading", icon: "🚁" },
+    { path: "/sprays", label: "Drone Sprays", icon: "🚁" },
+    { path: "/grading", label: "Grading", icon: "🚁" },
     { path: "/community", label: "Community", icon: "👥" },
   ] : [
     // Non-Farmer Menu (Financier/Buyer)

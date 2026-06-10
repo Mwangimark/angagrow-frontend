@@ -7,6 +7,8 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { isAuthenticated } from "./utils/auth";
 import Profile from "./pages/Profile";
+import SpraysPage from './pages/Sprays';
+
 // import LandingPage from "./pages/LandingPage";
 import CreateFarm from "./components/farms/CreateFarm";
 
@@ -30,6 +32,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crop-analysis" element={<CropAnalysis />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/sprays" element={<SpraysPage />} />
         </Route>
 
         <Route

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom' // ✅ ADD THIS
+import { useNavigate } from 'react-router-dom'
 import FarmerSummary from '../../components/dashboard/Farmerdb/FarmerSummary'
 import DashboardHeader from '../../components/dashboard/DashboardHeader'
 import CreateFarm from '../../components/farms/CreateFarm'
 import CreateBlock from '../../components/farms/CreateBlock'
 import FarmList from '../../components/farms/FarmList'
+import UpcomingSprays from '../../components/sprays/UpcomingSprays' // ✅ ADD THIS
+import SprayDetail from '../../components/sprays/SprayDetail' // ✅ ADD THIS
 import api from '../../utils/apis'
-import { getAccessToken, isTokenExpired } from '../../utils/auth' // ✅ ADD THIS
+import { getAccessToken, isTokenExpired } from '../../utils/auth'
 
 const Dashboardfarmer = () => {
-  const navigate = useNavigate() // ✅ ADD THIS
+  const navigate = useNavigate()
   const [showCreateFarm, setShowCreateFarm] = useState(false)
   const [showCreateBlock, setShowCreateBlock] = useState(false)
   const [farms, setFarms] = useState([])
@@ -17,12 +19,16 @@ const Dashboardfarmer = () => {
   const [currentFarmId, setCurrentFarmId] = useState(null)
   const [currentFarmName, setCurrentFarmName] = useState("")
   const [currentFarmTotalArea, setCurrentFarmTotalArea] = useState(0)
+  
+  // ✅ ADD THIS - State for spray detail modal
+  const [selectedSpray, setSelectedSpray] = useState(null)
+  const [showSprayDetail, setShowSprayDetail] = useState(false)
 
   const refreshFarmsData = async () => {
     await checkUserFarms();
   };
 
-  // ✅ UPDATE THIS useEffect - Check token FIRST
+  // Check token FIRST
   useEffect(() => {
     const validateAndFetch = async () => {
       const token = getAccessToken();
@@ -48,9 +54,8 @@ const Dashboardfarmer = () => {
     };
     
     validateAndFetch();
-  }, []); // ✅ Empty dependency array - runs once on mount
+  }, []);
 
-  // ✅ UPDATE checkUserFarms with better error handling
   const checkUserFarms = async () => {
     try {
       console.log('📡 Fetching farms from /farming/farms');
@@ -76,7 +81,6 @@ const Dashboardfarmer = () => {
     }
   }
 
-  // Rest of your functions remain exactly the same...
   const startFarmCreationFlow = () => {
     setShowCreateFarm(true)
     setShowCreateBlock(false)
@@ -112,6 +116,19 @@ const Dashboardfarmer = () => {
     setShowCreateBlock(true)
   }
 
+  // ✅ ADD THIS - Handle spray selection from upcoming widget
+  const handleSpraySelect = (spray) => {
+    setSelectedSpray(spray)
+    setShowSprayDetail(true)
+  }
+
+  // ✅ ADD THIS - Handle spray completion refresh
+  const handleSprayComplete = async (sprayId, completionData) => {
+    setShowSprayDetail(false)
+    setSelectedSpray(null)
+    // Refresh upcoming sprays widget will happen when modal closes
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -129,7 +146,18 @@ const Dashboardfarmer = () => {
 
       <div className={`transition-all duration-300 ${showCreateFarm || showCreateBlock ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'
         }`}>
-        <FarmerSummary />
+        
+        {/* ✅ UPDATED - Grid layout with FarmerSummary and UpcomingSprays side by side */}
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div className="lg:col-span-2">
+              <FarmerSummary />
+            </div>
+            <div>
+              <UpcomingSprays onSelectSpray={handleSpraySelect} />
+            </div>
+          </div>
+        </div>
 
         {farms.length > 0 && (
           <div className="container mx-auto px-4 mt-8">
@@ -225,6 +253,23 @@ const Dashboardfarmer = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ✅ ADD THIS - Spray Detail Modal */}
+      {showSprayDetail && selectedSpray && (
+        <SprayDetail
+          spray={selectedSpray}
+          onClose={() => {
+            setShowSprayDetail(false)
+            setSelectedSpray(null)
+          }}
+          onEdit={(spray) => {
+            setShowSprayDetail(false)
+            // You can add edit functionality here if needed
+            console.log('Edit spray:', spray)
+          }}
+          onComplete={handleSprayComplete}
+        />
       )}
     </>
   )
