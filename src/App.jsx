@@ -9,19 +9,21 @@ import { isAuthenticated } from "./utils/auth";
 import Profile from "./pages/Profile";
 import SpraysPage from './pages/Sprays';
 
-// import LandingPage from "./pages/LandingPage";
-import CreateFarm from "./components/farms/CreateFarm";
-
 function App() {
   const checkAuth = () => isAuthenticated();
 
   return (
     <Router basename={process.env.REACT_APP_BASENAME || "/"}>
       <Routes>
-        {/* <Route path="/" element={<LandingPage />} /> */}
+        {/* ✅ Root route - redirect to external landing page */}
+        <Route 
+          path="/" 
+          element={<Navigate to={process.env.REACT_APP_LANDING_URL || "https://angagrow.com"} replace />} 
+        />
+        
         <Route
           path="/login"
-          element={checkAuth() ? <Navigate to="/register" replace /> : <Login />}
+          element={checkAuth() ? <Navigate to="/dashboard" replace /> : <Login />}
         />
         <Route
           path="/register"
